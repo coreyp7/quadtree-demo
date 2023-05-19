@@ -1,23 +1,24 @@
 #include "sorting.h"
+#include <cstdlib>
+#include <cassert>
 
-const int COUNT = 100;
+const int COUNT = 1000;
 
 int main(int, char**){
 
+	// Make random array
 	int items[COUNT];
 	for (int i = 0; i < COUNT; i++) {
-		int numb = rand() % 100;
+		int numb = rand() % 1000;
 		items[i] = numb;
-		printf("%i,", numb);
 	}
+
+	printf("before:");
+	printArray(items, COUNT);
 
 	sort(items, COUNT);
 
-	printf("\n");
-	printf("sorted:");
-
-	for (int i = 0; i < COUNT; i++) {
-		printf("%i,", items[i]);
-	}
-	printf("\n");
+	printf("after:");
+	printArray(items, COUNT);
+	printf("Status: %s", (isSorted(items, COUNT)) ? "sorted" : "NOT SORTED");
 }
