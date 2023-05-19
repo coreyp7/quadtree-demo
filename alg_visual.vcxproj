@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\oldmain.cpp" />
     <ClCompile Include="src\sorting.cpp" />
   </ItemGroup>
   <ItemGroup>

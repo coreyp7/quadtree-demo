@@ -1,22 +1,25 @@
 #include "sorting.h"
 
 // Right now its just selection sort
-void sort(std::vector<int> items) {
-	int index = 0;
+void sort(int* items, int count) {
+	int i;
 
-	for (int i = 0; i < items.size(); i++) {
+	for (i = 0; i < count-1; i++) {
+
+		int min = -1;
 		int minIndex = -1;
-		int minValue = -1;
 
-		for (int j = 0; j < items.size(); j++) {
-			if (items[j] < minValue || minValue == -1) {// this assumes that all items are positive
-				minValue = items[j];
+		for (int j = i+1; j < count; j++) {
+			if (items[j] < min || min == -1) {
+				min = items[j];
 				minIndex = j;
 			}
 		}
 
-		int iOld = items[i];
-		items[i] = minValue;
-		items[minIndex] = iOld;
+		// Swap i and minIndex
+		int temp = items[i];
+		items[i] = min;
+		items[minIndex] = temp;
 	}
+	// array is now sorted
 }

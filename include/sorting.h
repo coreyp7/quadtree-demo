@@ -2,4 +2,4 @@
 #include<stdio.h>
 #include<vector>
 
-void sort(std::vector<int> items);
+void sort(int items[], int count);
