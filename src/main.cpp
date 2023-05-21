@@ -45,11 +45,20 @@ void showImGui();
 int main(int, char**)
 {
     Tree tree = Tree(5);
-    tree.insert(3);
-    tree.insert(4);
-    tree.insert(8);
+    for (int i = 0; i < 500; i++) {
+        int numb = rand() % 1000;
+        tree.insert(numb);
+    }
 
-    printf("%i", tree.searchTree(4)->value);
+    //printf("%i\n", tree.searchTree(5)->value); // TODO: have search tree return tree value is in
+
+    printf("%s\n", (tree.isBST() ? "valid" : "INVALID BST"));
+    printf("%i\n", tree.min());
+    printf("%i\n", tree.max());
+
+    printf(tree.to_string().c_str());
+
+
 
 //    // Setup SDL
 //    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)

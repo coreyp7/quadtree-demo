@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include <iostream>
+#include <string>
 
 class Tree {
 
@@ -15,6 +18,10 @@ public:
 
 	void insert(int value);
 	Tree* searchTree(int value);
+	int min();
+	int max();
+	std::vector<int> getOrderedVector();
+	std::string to_string();
 
 	bool isBST();
 
