@@ -17,12 +17,13 @@ public:
 	~Tree();
 
 	void insert(int value);
+	void remove(int value);
 	Tree* searchTree(int value);
-	int min();
-	int max();
+	Tree* min();
+	Tree* max();
 	std::vector<int> getOrderedVector();
 	std::string to_string();
 
-	bool isBST();
+	bool valid();
 
 };

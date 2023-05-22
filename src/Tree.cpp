@@ -35,6 +35,58 @@ void Tree::insert(int newValue) {
 	}
 }
 
+void Tree::remove(int value) {
+	// Value matches, delete this.
+	if (this->value == value) {
+		// remove this and fix the pointers to where they should be
+		if (right != nullptr) {
+
+			// replace pointers from this Tree to right's smallest child node.
+			//right->min()->parent = this->parent;
+			//if(right->min()->value != right->value){
+			//	right->min()->right = this->right;
+			//}
+			//else {
+			//	right->min()->right = nullptr;
+			//}
+			//// set this->left to be the new node's left.
+			//if (left != nullptr) {
+			//	right->min()->left = left;
+			//}
+			//
+			//// Set parent's pointer from this to right's min node.
+			//if (parent->value > this->value) {
+			//	parent->left = right->min();
+			//}
+			//else if (parent->value < this->value) {
+			//	parent->right = right->min();
+			//}
+
+
+
+		}
+		else if (left != nullptr) {
+			left->parent = this->parent;
+			
+			if (parent->value > this->value) {
+				parent->left = left;
+			}
+			else if (parent->value < this->value) {
+				parent->right = left;
+			}
+		}
+		delete this;
+	}
+	else { // Go down the tree further to find the value.
+		if (value < this->value) {
+			left->remove(value);
+		}
+		else if (value > this->value) {
+			right->remove(value);
+		}
+	}
+}
+
 Tree* Tree::searchTree(int value) {
 	//TODO: implement with a while loop, wikipedia says that it
 	// performs more efficient (on "most machines").
@@ -59,7 +111,7 @@ Tree* Tree::searchTree(int value) {
 }
 
 // Returns whether or not this is a valid bst.
-bool Tree::isBST() {
+bool Tree::valid() {
 
 	if (left != nullptr && right != nullptr) {
 		if (!(left->value < right->value)) {
@@ -68,23 +120,23 @@ bool Tree::isBST() {
 		else if (!(value > left->value || value < right->value)) {
 			return false;
 		}
-		return left->isBST() && right->isBST();
+		return left->valid() && right->valid();
 	}
 	// this is a leaf node, so just return true.
 	return true;
 }
 
-int Tree::min() {
+Tree* Tree::min() {
 	if (left == nullptr) {
-		return value;
+		return this;
 	}
 
 	return left->min();
 }
 
-int Tree::max() {
+Tree* Tree::max() {
 	if (right == nullptr) {
-		return value;
+		return this;
 	}
 
 	return right->max();

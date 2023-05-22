@@ -10,8 +10,11 @@
 #include <SDL.h>
 
 #include "Tree.h"
+#include "QuadTree.h"
 
 const int COUNT = 1000;
+const int WINDOW_WIDTH = 1280;
+const int WINDOW_HEIGHT = 720;
 
 SDL_Renderer* renderer;
 SDL_Window* window;
@@ -44,19 +47,67 @@ void showImGui();
 // Main code
 int main(int, char**)
 {
-    Tree tree = Tree(5);
-    for (int i = 0; i < 500; i++) {
-        int numb = rand() % 1000;
-        tree.insert(numb);
+    QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    setup();
+
+    SDL_Event event;
+    bool done = false;
+    while (!done) {
+        while (SDL_PollEvent(&event))
+        {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT)
+                done = true;
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+                done = true;
+        }
+
+        // Render quadtree
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_Rect rect = { qTree->x, qTree->y, qTree->width, qTree->height };
+        SDL_RenderDrawRect(renderer, &rect);
+        SDL_RenderPresent(renderer);
     }
 
-    //printf("%i\n", tree.searchTree(5)->value); // TODO: have search tree return tree value is in
+    // Cleanup
+    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 
-    printf("%s\n", (tree.isBST() ? "valid" : "INVALID BST"));
-    printf("%i\n", tree.min());
-    printf("%i\n", tree.max());
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
-    printf(tree.to_string().c_str());
+    //Tree* tree = new Tree(5);
+    ///*for (int i = 0; i < 500; i++) {
+    //    int numb = rand() % 1000;
+    //    tree.insert(numb);
+    //}*/
+
+    ////tree.insert(3);
+    //tree->insert(6);
+    //tree->insert(87);
+    //tree->insert(73);
+    //tree->insert(543);
+    //tree->insert(47);
+    //tree->insert(3);
+
+    //printf(tree->to_string().c_str());
+    //printf("\n");
+
+    //tree->remove(87);
+    ////printf("%i\n", tree.searchTree(5)->value); // TODO: have search tree return tree value is in
+
+    //printf("%s\n", (tree->valid() ? "valid" : "INVALID BST"));
+    //printf("%i\n", tree->min()->value);
+    //printf("%i\n", tree->max()->value);
+
+    //printf(tree->to_string().c_str());
 
 
 
@@ -211,7 +262,7 @@ int setup() {
 
     // Create window with SDL_Renderer graphics context
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, window_flags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
     {

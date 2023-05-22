@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\QuadTree.cpp" />
     <ClCompile Include="src\Tree.cpp" />
     <ClCompile Include="src\sorting.cpp" />
     <ClCompile Include="src\util.cpp" />
@@ -143,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="include\Element.h" />
     <ClInclude Include="include\Node.h" />
+    <ClInclude Include="include\QuadTree.h" />
     <ClInclude Include="include\Tree.h" />
     <ClInclude Include="include\sorting.h" />
     <ClInclude Include="include\util.h" />
