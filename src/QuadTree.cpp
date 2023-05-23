@@ -34,17 +34,19 @@ void QuadTree::insert(SDL_FPoint point) {
 		// For now, I'm going to add the point to every tree
 		// which it technically belongs to. I believe this
 		// is how this is supposed to work.
-		if (nw->insideOf(point)) {
-			nw->insert(point);
-		}
-		if (ne->insideOf(point)) {
-			ne->insert(point);
-		}
-		if (sw->insideOf(point)) {
-			sw->insert(point);
-		}
-		if (se->insideOf(point)) {
-			se->insert(point);
+		for (int i = 0; i < points.size(); i++) {
+			if (nw->insideOf(points[i])) {
+				nw->insert(points[i]);
+			}
+			if (ne->insideOf(points[i])) {
+				ne->insert(points[i]);
+			}
+			if (sw->insideOf(points[i])) {
+				sw->insert(points[i]);
+			}
+			if (se->insideOf(points[i])) {
+				se->insert(points[i]);
+			}
 		}
 		// I'm not sure if I'm supposed to do this, but
 		// am going with it for now because it makes
@@ -60,6 +62,30 @@ bool QuadTree::insideOf(SDL_FPoint point) {
 		return true;
 	}
 	return false;
+}
+
+void QuadTree::draw(SDL_Renderer* renderer) {
+	SDL_Rect rect = { x,y,width,height };
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderDrawRect(renderer, &rect);
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	
+	// Because there's only points in leafs (as of rn),
+	// only check if this is a leaf.
+	if (isLeaf) {
+		for (int i = 0; i < points.size(); i++) {
+			//SDL_RenderDrawPoint(renderer, points[i].x, points[i].y);
+			SDL_FRect frect = { points[i].x, points[i].y, 50, 50 };
+			SDL_RenderDrawRectF(renderer, &frect);
+		}
+	}
+	else {
+		nw->draw(renderer);
+		ne->draw(renderer);
+		sw->draw(renderer);
+		se->draw(renderer);
+	}
 }
 
 /*

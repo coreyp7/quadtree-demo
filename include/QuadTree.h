@@ -30,4 +30,8 @@ public:
 
 	// For confirming if a point belongs in this QuadTree (square).
 	bool insideOf(SDL_FPoint point);
+
+	// Will draw this entire QuadTree and all of its children.
+	// (Will also draw the points).
+	void draw(SDL_Renderer* renderer);
 };

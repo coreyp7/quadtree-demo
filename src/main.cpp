@@ -48,6 +48,14 @@ void showImGui();
 int main(int, char**)
 {
     QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    SDL_FPoint point1 = { 250, 250 };
+    SDL_FPoint point2 = { 1050, 250 };
+    SDL_FPoint point3 = { 950, 250 };
+    SDL_FPoint point4 = { 750, 250 };
+    qTree->insert(point1);
+    qTree->insert(point2);
+    qTree->insert(point3);
+    qTree->insert(point4);
 
     setup();
 
@@ -69,8 +77,9 @@ int main(int, char**)
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_Rect rect = { qTree->x, qTree->y, qTree->width, qTree->height };
-        SDL_RenderDrawRect(renderer, &rect);
+        /*SDL_Rect rect = { qTree->x, qTree->y, qTree->width, qTree->height };
+        SDL_RenderDrawRect(renderer, &rect);*/
+        qTree->draw(renderer);
         SDL_RenderPresent(renderer);
     }
 
