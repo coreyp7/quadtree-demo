@@ -5,6 +5,8 @@
 class QuadTree {
 public:
 
+	static const int LIMIT = 2;
+
 	// Pointers to all children of this 'node'. 
 	QuadTree* nw;
 	QuadTree* ne;
@@ -16,13 +18,16 @@ public:
 
 	// TEMPORARY: will contain squares later. Getting it working with points first because its easier to think about.
 	// Also, I haven't figured out if points which are in the children appear here; will determine during implementation.
-	std::vector<SDL_Point> points;
+	std::vector<SDL_FPoint> points;
 
 	// Position of this QuadTree square (from top left).
 	int x, y, width, height;
 
-	QuadTree(int x, int y, int width, int height);
+	QuadTree(float x, float y, float width, float height);
 	~QuadTree();
 
+	void insert(SDL_FPoint point);
 
+	// For confirming if a point belongs in this QuadTree (square).
+	bool insideOf(SDL_FPoint point);
 };
