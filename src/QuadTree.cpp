@@ -96,8 +96,9 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 	if (isLeaf) {
 		for (int i = 0; i < points.size(); i++) {
 			//SDL_RenderDrawPoint(renderer, points[i].x, points[i].y);
-			SDL_FRect frect = { points[i].x, points[i].y, 50, 50 };
-			SDL_RenderDrawRectF(renderer, &frect);
+			SDL_FRect frect = { points[i].x, points[i].y, 4, 4 };
+			//SDL_RenderDrawRectF(renderer, &frect);
+			SDL_RenderFillRectF(renderer, &frect);
 		}
 	}
 	else {

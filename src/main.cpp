@@ -48,15 +48,24 @@ void showImGui();
 int main(int, char**)
 {
     QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    SDL_FPoint point1 = { 250, 250 };
+    /*SDL_FPoint point1 = { 250, 250 };
     SDL_FPoint point2 = { 1050, 250 };
     SDL_FPoint point3 = { 950, 250 };
     SDL_FPoint point4 = { 750, 250 };
     qTree->insert(point1);
     qTree->insert(point2);
     qTree->insert(point3);
-    qTree->insert(point4);
+    qTree->insert(point4);*/
+
+    for (int i = 0; i < 750; i++) {
+        int numbX = rand() % WINDOW_WIDTH;
+        int numbY = rand() % WINDOW_HEIGHT;
+        SDL_FPoint point = {numbX, numbY};
+        qTree->insert(point);
+    }
     printf("Everything inserted.\n");
+
+
 
     setup();
 
