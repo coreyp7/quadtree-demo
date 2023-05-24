@@ -56,6 +56,7 @@ int main(int, char**)
     qTree->insert(point2);
     qTree->insert(point3);
     qTree->insert(point4);
+    printf("Everything inserted.\n");
 
     setup();
 
