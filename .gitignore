@@ -3,6 +3,11 @@
 # imgui
 imgui.ini
 
+# Going to add sln and project files for now, because I don't want this
+# stuff changing across the project, its system specific.
+*.sln
+*.vcxproj*
+
 # visual studio ignore from online. Leaving unchanged.
 
 ## Ignore Visual Studio temporary files, build results, and
