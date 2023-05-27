@@ -11,6 +11,7 @@
 
 #include "Tree.h"
 #include "QuadTree.h"
+#include "Dot.h"
 
 const int COUNT = 1000;
 const int WINDOW_WIDTH = 1280;
@@ -58,13 +59,13 @@ int main(int, char**)
     qTree->insert(point4);*/
 
     for (int i = 0; i < 750; i++) {
-        int numbX = rand() % WINDOW_WIDTH;
-        int numbY = rand() % WINDOW_HEIGHT;
-        SDL_FPoint point = {numbX, numbY};
-        qTree->insert(point);
+        float numbX = rand() % WINDOW_WIDTH;
+        float numbY = rand() % WINDOW_HEIGHT;
+        //SDL_FPoint point = {numbX, numbY};
+        Dot dot = { numbX, numbY };
+        qTree->insert(dot);
     }
     printf("Everything inserted.\n");
-
 
 
     setup();

@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h> // using only for certain structs
 #include <vector>
+#include "Dot.h"
 
 class QuadTree {
 public:
@@ -18,7 +19,7 @@ public:
 
 	// TEMPORARY: will contain squares later. Getting it working with points first because its easier to think about.
 	// Also, I haven't figured out if points which are in the children appear here; will determine during implementation.
-	std::vector<SDL_FPoint> points;
+	std::vector<Dot> points;
 
 	// Position of this QuadTree square (from top left).
 	int x, y, width, height;
@@ -26,10 +27,10 @@ public:
 	QuadTree(float x, float y, float width, float height);
 	~QuadTree();
 
-	void insert(SDL_FPoint point);
+	void insert(Dot point);
 
 	// For confirming if a point belongs in this QuadTree (square).
-	bool insideOf(SDL_FPoint point);
+	bool insideOf(Dot point);
 
 	// Will draw this entire QuadTree and all of its children.
 	// (Will also draw the points).
