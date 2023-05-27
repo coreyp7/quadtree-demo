@@ -15,7 +15,12 @@ QuadTree::QuadTree(float x, float y, float width, float height) {
 }
 
 QuadTree::~QuadTree() {
-
+	if (!isLeaf) {
+		delete nw;
+		delete ne;
+		delete sw;
+		delete se;
+	}
 }
 
 void QuadTree::insert(Dot* point) {
@@ -108,6 +113,28 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 		ne->draw(renderer);
 		sw->draw(renderer);
 		se->draw(renderer);
+	}
+}
+
+void QuadTree::update() {
+	/*
+	* NOTE: at some point I'm going to have to check if
+	* all of a QuadTree's leafs are empty. If so, then we 
+	* change that QuadTree back into a leaf. 
+	*/
+
+	if (isLeaf) {
+		for (int i = 0; i < points.size(); i++) {
+			if (!insideOf(points[i])) {
+
+			}
+		}
+	}
+	else {
+		nw->update();
+		ne->update();
+		sw->update();
+		se->update();
 	}
 }
 

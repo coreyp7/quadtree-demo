@@ -35,4 +35,6 @@ public:
 	// Will draw this entire QuadTree and all of its children.
 	// (Will also draw the points).
 	void draw(SDL_Renderer* renderer);
+
+	void update();
 };

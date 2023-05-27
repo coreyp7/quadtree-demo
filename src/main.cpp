@@ -92,6 +92,12 @@ int main(int, char**)
         }
         lastPhysicsUpdate = SDL_GetTicks();
 
+        qTree->~QuadTree();
+        qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        for (int i = 0; i < 750; i++) {
+            qTree->insert(dots[i]);
+        }
+
         // Render quadtree
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
