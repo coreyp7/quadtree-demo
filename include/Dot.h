@@ -6,7 +6,7 @@ class Dot {
 public:
 	// This class is basically a wrapper around
 	// this SDL_FPoint.
-	SDL_FPoint pos;
+	SDL_FPoint* pos;
 
 	const static int SPEED = 10;
 

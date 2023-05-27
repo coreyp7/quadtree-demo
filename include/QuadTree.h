@@ -19,7 +19,7 @@ public:
 
 	// TEMPORARY: will contain squares later. Getting it working with points first because its easier to think about.
 	// Also, I haven't figured out if points which are in the children appear here; will determine during implementation.
-	std::vector<Dot> points;
+	std::vector<Dot*> points;
 
 	// Position of this QuadTree square (from top left).
 	int x, y, width, height;
@@ -27,10 +27,10 @@ public:
 	QuadTree(float x, float y, float width, float height);
 	~QuadTree();
 
-	void insert(Dot point);
+	void insert(Dot* point);
 
 	// For confirming if a point belongs in this QuadTree (square).
-	bool insideOf(Dot point);
+	bool insideOf(Dot* point);
 
 	// Will draw this entire QuadTree and all of its children.
 	// (Will also draw the points).

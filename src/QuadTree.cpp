@@ -18,7 +18,7 @@ QuadTree::~QuadTree() {
 
 }
 
-void QuadTree::insert(Dot point) {
+void QuadTree::insert(Dot* point) {
 
 	// First check if this isn't a leaf node.
 	if (!isLeaf) {
@@ -76,11 +76,11 @@ void QuadTree::insert(Dot point) {
 	}
 }
 
-bool QuadTree::insideOf(Dot point) {
-	SDL_FPoint pos = point.pos;
+bool QuadTree::insideOf(Dot* point) {
+	SDL_FPoint* pos = point->pos;
 
-	if ((pos.x < (x + width) && pos.x > x)
-		&& (pos.y < (y + height) && pos.y > y)) {
+	if ((pos->x < (x + width) && pos->x > x)
+		&& (pos->y < (y + height) && pos->y > y)) {
 		return true;
 	}
 	return false;
@@ -98,7 +98,7 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 	if (isLeaf) {
 		for (int i = 0; i < points.size(); i++) {
 			//SDL_RenderDrawPoint(renderer, points[i].x, points[i].y);
-			SDL_FRect frect = { points[i].pos.x, points[i].pos.y, 4, 4 };
+			SDL_FRect frect = { points[i]->pos->x, points[i]->pos->y, 4, 4 };
 			//SDL_RenderDrawRectF(renderer, &frect);
 			SDL_RenderFillRectF(renderer, &frect);
 		}

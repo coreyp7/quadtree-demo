@@ -57,18 +57,22 @@ int main(int, char**)
     qTree->insert(point2);
     qTree->insert(point3);
     qTree->insert(point4);*/
+    std::vector<Dot*> dots;
 
     for (int i = 0; i < 750; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
         //SDL_FPoint point = {numbX, numbY};
-        Dot dot = { numbX, numbY };
+        Dot* dot = new Dot(numbX, numbY);
         qTree->insert(dot);
+        dots.push_back(dot);
     }
     printf("Everything inserted.\n");
 
 
     setup();
+
+    float lastPhysicsUpdate = 0;
 
     SDL_Event event;
     bool done = false;
@@ -81,6 +85,12 @@ int main(int, char**)
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
         }
+
+        float dt = (SDL_GetTicks() - lastPhysicsUpdate)/1000;
+        for (int i = 0; i < dots.size(); i++) {
+            dots[i]->simulate(dt);
+        }
+        lastPhysicsUpdate = SDL_GetTicks();
 
         // Render quadtree
 
