@@ -57,13 +57,14 @@ int main(int, char**)
     qTree->insert(point2);
     qTree->insert(point3);
     qTree->insert(point4);*/
+
     std::vector<Dot*> dots;
 
-    for (int i = 0; i < 2000; i++) {
+    for (int i = 0; i < 20; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
         //SDL_FPoint point = {numbX, numbY};
-        Dot* dot = new Dot(numbX, numbY);
+        Dot* dot = new Dot(numbX, numbY, 35, 35);
         qTree->insert(dot);
         dots.push_back(dot);
     }

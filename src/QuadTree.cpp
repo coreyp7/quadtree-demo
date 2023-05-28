@@ -60,7 +60,10 @@ void QuadTree::insert(Dot* point) {
 			// is how this is supposed to work.
 			for (int i = 0; i < points.size(); i++) {
 				if (nw->insideOf(points[i])) {
-					nw->insert(points[i]);
+					nw->insert(points[i]); // A stackoverflow points to here.
+					// I think its because insideOf function is shitty right now.
+					// Because this insert infinitely loops on the second
+					// square in the points list.
 				}
 				if (ne->insideOf(points[i])) {
 					ne->insert(points[i]);
@@ -82,13 +85,22 @@ void QuadTree::insert(Dot* point) {
 }
 
 bool QuadTree::insideOf(Dot* point) {
-	SDL_FPoint* pos = point->pos;
+	SDL_FRect* rect = point->rect;
 
-	if ((pos->x < (x + width) && pos->x > x)
+	/*if ((pos->x < (x + width) && pos->x > x)
 		&& (pos->y < (y + height) && pos->y > y)) {
 		return true;
 	}
-	return false;
+	return false;*/
+
+	//bool collisionX = rect->x <= x + width && rect->x + rect->w <= x;
+	//bool collisionY = rect->y <= y + height && rect->y + rect->h <= y;
+
+	bool colX = ((rect->x + rect->w) >= x) && ((x + width) >= rect->x);
+	bool colY = ((rect->y + rect->h) >= y) && ((y + height) >= rect->y);
+
+	return colX && colY;
+
 }
 
 void QuadTree::draw(SDL_Renderer* renderer) {
@@ -103,9 +115,9 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 	if (isLeaf) {
 		for (int i = 0; i < points.size(); i++) {
 			//SDL_RenderDrawPoint(renderer, points[i].x, points[i].y);
-			SDL_FRect frect = { points[i]->pos->x, points[i]->pos->y, 4, 4 };
+			//SDL_FRect frect = { points[i]->rect->x, points[i]->pos->y, 4, 4 };
 			//SDL_RenderDrawRectF(renderer, &frect);
-			SDL_RenderFillRectF(renderer, &frect);
+			SDL_RenderFillRectF(renderer, points[i]->rect);
 		}
 	}
 	else {

@@ -6,7 +6,7 @@
 class QuadTree {
 public:
 
-	static const int LIMIT = 2;
+	static const int LIMIT = 4;
 
 	// Pointers to all children of this 'node'. 
 	QuadTree* nw;

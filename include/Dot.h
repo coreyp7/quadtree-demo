@@ -6,7 +6,7 @@ class Dot {
 public:
 	// This class is basically a wrapper around
 	// this SDL_FPoint.
-	SDL_FPoint* pos;
+	SDL_FRect* rect;
 
 	const static int SPEED = 10;
 
@@ -16,7 +16,7 @@ public:
 	const static int X_MAX = 1080;
 	const static int Y_MAX = 720;
 
-	Dot(float x, float y);
+	Dot(float x, float y, float w, float h);
 	~Dot();
 
 	void simulate(float dt);

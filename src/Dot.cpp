@@ -1,34 +1,34 @@
 #include "Dot.h"
 
-Dot::Dot(float x, float y) {
-	pos = new SDL_FPoint{ x, y };
+Dot::Dot(float x, float y, float w, float h) {
+	rect = new SDL_FRect{ x, y, w, h };
 
+	// Set random velocity for square to move at.
 	xVel = (float)(rand()) / (float)(rand());
 	yVel = (float)(rand()) / (float)(rand());
-
 	xVel *= 10;
 	yVel *= 10;
 
 }
 
 Dot::~Dot() {
-
+	delete rect;
 }
 
 void Dot::simulate(float dt) {
-	float oldX = pos->x;
-	float oldY = pos->y;
+	float oldX = rect->x;
+	float oldY = rect->y;
 
-	pos->x += xVel * dt;
-	pos->y += yVel * dt;
+	rect->x += xVel * dt;
+	rect->y += yVel * dt;
 
-	if (pos->x < 0 || pos->x > X_MAX) {
+	if (rect->x < 0 || rect->x > X_MAX) {
 		xVel = -xVel;
-		pos->x = oldX + (xVel * dt);
+		rect->x = oldX + (xVel * dt);
 	}
 
-	if (pos->y < 0 || pos->y > Y_MAX) {
+	if (rect->y < 0 || rect->y > Y_MAX) {
 		yVel = -yVel;
-		pos->y = oldY + (yVel * dt);
+		rect->y = oldY + (yVel * dt);
 	}
 }
