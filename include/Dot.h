@@ -12,6 +12,10 @@ public:
 
 	float xVel, yVel;
 
+	// min is just implied to be 0.
+	const static int X_MAX = 1080;
+	const static int Y_MAX = 720;
+
 	Dot(float x, float y);
 	~Dot();
 
