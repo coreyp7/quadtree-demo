@@ -6,7 +6,7 @@
 class QuadTree {
 public:
 
-	static const int LIMIT = 4;
+	static const int LIMIT = 2;
 
 	// Pointers to all children of this 'node'. 
 	QuadTree* nw;
@@ -23,6 +23,10 @@ public:
 
 	// Position of this QuadTree square (from top left).
 	int x, y, width, height;
+
+  // Used to determine "how deep" we are down the tree.
+  // If its > 5, stop; don't create any more leaf nodes.
+  int depth;
 
 	QuadTree(float x, float y, float width, float height);
 	~QuadTree();

@@ -68,6 +68,11 @@ int main(int, char**)
         qTree->insert(dot);
         dots.push_back(dot);
     }
+    /*Dot* dot = new Dot(3, 3, 35, 35);
+    dot->xVel = 500;
+    dot->yVel = 500;
+    qTree->insert(dot);
+    dots.push_back(dot);*/
     printf("Everything inserted.\n");
 
 

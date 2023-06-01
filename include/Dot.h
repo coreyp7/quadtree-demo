@@ -13,7 +13,9 @@ public:
 	float xVel, yVel;
 
 	// min is just implied to be 0.
-	const static int X_MAX = 1080;
+	// @bad: this is hardcoded, later can change to
+	// size of area during runtime.
+	const static int X_MAX = 1280;
 	const static int Y_MAX = 720;
 
 	Dot(float x, float y, float w, float h);

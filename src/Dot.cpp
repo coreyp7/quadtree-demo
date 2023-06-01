@@ -22,12 +22,12 @@ void Dot::simulate(float dt) {
 	rect->x += xVel * dt;
 	rect->y += yVel * dt;
 
-	if (rect->x < 0 || rect->x > X_MAX) {
+	if (rect->x < 0 || rect->x + rect->w > X_MAX) {
 		xVel = -xVel;
 		rect->x = oldX + (xVel * dt);
 	}
 
-	if (rect->y < 0 || rect->y > Y_MAX) {
+	if (rect->y < 0 || rect->y + rect->h > Y_MAX) {
 		yVel = -yVel;
 		rect->y = oldY + (yVel * dt);
 	}

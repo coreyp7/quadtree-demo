@@ -47,6 +47,12 @@ void QuadTree::insert(Dot* point) {
 		// If so, then create our 4 quadtrees and insert
 		// all my points into my (appropriate) children.
 		if (points.size() >= LIMIT) {
+      if(depth >= 5){
+        return; 
+        // ignore; stop making new quadtrees to avoid stackoverflow.
+        // these rects are probably colliding
+      }
+
 			isLeaf = false;
 	
 			// TODO: could make this cleaner by precalculating width/height stuff.
@@ -54,6 +60,10 @@ void QuadTree::insert(Dot* point) {
 			ne = new QuadTree(x + (width / 2), y, width / 2, height / 2);
 			sw = new QuadTree(x, y + (height / 2), width / 2, height / 2);
 			se = new QuadTree(x + (width / 2), y + (height / 2), width / 2, height / 2);
+      nw->depth = this->depth+1;
+      ne->depth = this->depth+1;
+      sw->depth = this->depth+1;
+      se->depth = this->depth+1;
 
 			// For now, I'm going to add the point to every tree
 			// which it technically belongs to. I believe this
