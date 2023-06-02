@@ -22,7 +22,8 @@ SDL_Window* window;
 ImGuiIO io;
 
 int setup();
-void showImGui();
+//void showImGui();
+bool detectAndResolveCollision(Dot* rect1, Dot* rect2);
 
 //int main(int, char**){
 //
@@ -76,8 +77,9 @@ int main(int, char**)
     dots.push_back(dot);*/
     printf("Everything inserted.\n"); 
 
-    std::vector<QuadTree*> dot_contained_trees = qTree->getLeafs(dots[3]);
-    printf("Size: %i\n", dot_contained_trees.size());
+    //std::vector<QuadTree*> dot_contained_trees = qTree->getLeafs(dots[3]);
+
+    //printf("Size: %i\n", dot_contained_trees.size());
 
     setup();
 
@@ -95,20 +97,47 @@ int main(int, char**)
                 done = true;
         }
 
+        // Simulate game state (motion of rects)
         float dt = (SDL_GetTicks() - lastPhysicsUpdate)/1000;
         for (int i = 0; i < dots.size(); i++) {
             dots[i]->simulate(dt);
         }
         lastPhysicsUpdate = SDL_GetTicks();
 
+        // Reconstruct QuadTree of all entities/rects
         qTree->~QuadTree();
         qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         for (int i = 0; i < dots.size(); i++) {
             qTree->insert(dots[i]);
         }
 
-        // Render quadtree
+        // Check/handle collisions of rects
+        int collisionsThisFrame = 0;
+        int dotsCheckedThisFrame = 0;
+        for(int i=0; i<dots.size(); i++){
+          Dot* curr = dots[i];
+          std::vector<QuadTree*> currLeafs = qTree->getLeafs(curr);
+          // For each leaf this rect is inside of
+          for(int j=0; j<currLeafs.size(); j++){
+            QuadTree* currLeaf = currLeafs[j];
+            // Iterate through other rects inside of this leaf
+            // and check for collision with 'curr' rect.
+            for(int k=0; k<currLeaf->points.size(); k++){
+              dotsCheckedThisFrame++;
+              Dot* other = currLeaf->points[k];
+              if(&curr != &other){// if they're the same dot ignore
+                // check if they're colliding and resolve it.
+                // for now, just detecting it.
+                bool collision = detectAndResolveCollision(curr, other); 
+                if(collision){
+                 collisionsThisFrame++; 
+                }
+              }
+            }
+          }
+        }
 
+        // Rendering
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
@@ -116,6 +145,29 @@ int main(int, char**)
         /*SDL_Rect rect = { qTree->x, qTree->y, qTree->width, qTree->height };
         SDL_RenderDrawRect(renderer, &rect);*/
         qTree->draw(renderer);
+
+        // ImGui stuff
+        //showImGui();
+
+        // MY WINDOW CREATED HERE
+        ImGui_ImplSDLRenderer_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+        bool show = true;
+
+        ImGui::ShowDemoWindow(&show);
+        //ImGui::Begin("Algorithm Visualizer");
+        ImGui::Begin("Info");
+        std::string comparisonText = "Number of comparisons this frame:";
+        //int testNumb = 32;
+        comparisonText += std::to_string(dotsCheckedThisFrame);
+        ImGui::Text(comparisonText.c_str());
+        ImGui::End();
+        // MY WINDOW CREATED HERE
+
+        ImGui::Render();
+        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
         SDL_RenderPresent(renderer);
     }
 
@@ -273,21 +325,23 @@ void showImGui() {
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
+    bool show = true;
 
-    /*ImGui::ShowDemoWindow(&show_demo_window);*/
-    ImGui::Begin("Algorithm Visualizer");
+    ImGui::ShowDemoWindow(&show);
+    //ImGui::Begin("Algorithm Visualizer");
+    ImGui::Begin("Info");
 
+    /*
     const char* items[] = { "Selection Sort", "Merge Sort", "etc" };
     static int item_current = 1;
     ImGui::ListBox("Pick algorithm", &item_current, items, IM_ARRAYSIZE(items), 4);
 
     if (ImGui::Button("Start")) {
-        //printf(items[item_current]);
-        /*printArray(arr, COUNT);
-        selectionSort(arr, COUNT);
-        printArray(arr, COUNT);
-        printf("Status: %s", (isSorted(arr, COUNT)) ? "sorted" : "NOT SORTED");*/
+        //selectionSort(arr, COUNT);
+        //printArray(arr, COUNT);
+        //printf("Status: %s", (isSorted(arr, COUNT)) ? "sorted" : "NOT SORTED");
     }
+    */
     ImGui::End();
 }
 
@@ -335,3 +389,21 @@ int setup() {
 
     return 0;
 }
+
+
+bool detectAndResolveCollision(Dot* dot1, Dot* dot2){
+  SDL_FRect rect1 = *dot1->rect;
+  SDL_FRect rect2 = *dot2->rect;
+
+  bool xCollision = (((rect1.x + rect1.w) >= (rect2.x)) && ((rect2.x + rect2.w) >= (rect1.x)));
+  bool yCollision = (((rect1.y + rect1.h) >= (rect2.y)) && ((rect2.y + rect2.h) >= (rect1.y)));
+  
+  // If theres a collision, resolve it here.
+  /*
+  if(xCollision && yCollision){
+    
+  }
+  */
+  return xCollision && yCollision;
+}
+
