@@ -9,6 +9,7 @@ public:
 	SDL_FRect* rect;
 
 	const static int SPEED = 10;
+  static int ID_COUNTER; 
 
 	float xVel, yVel;
 
@@ -17,6 +18,8 @@ public:
 	// size of area during runtime.
 	const static int X_MAX = 1280;
 	const static int Y_MAX = 720;
+ 
+  int id;
 
 	Dot(float x, float y, float w, float h);
 	~Dot();

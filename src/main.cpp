@@ -13,7 +13,7 @@
 #include "QuadTree.h"
 #include "Dot.h"
 
-const int COUNT = 500;
+const int COUNT = 5000;
 int COUNT_SQUARED = COUNT*COUNT;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
@@ -72,8 +72,8 @@ int main(int, char**)
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
         //SDL_FPoint point = {numbX, numbY};
-        Dot* dot = new Dot(numbX, numbY, 35, 35);
-        //Dot* dot = new Dot(numbX, numbY, 6, 6);
+        //Dot* dot = new Dot(numbX, numbY, 35, 35);
+        Dot* dot = new Dot(numbX, numbY, 6, 6);
         qTree->insert(dot);
         dots.push_back(dot);
     }
@@ -125,6 +125,10 @@ int main(int, char**)
         for(int i=0; i<dots.size(); i++){
           Dot* curr = dots[i];
           std::vector<QuadTree*> currLeafs = qTree->getLeafs(curr);
+
+          // Keep tracks of rects collided with to avoid duplicates.
+          std::vector<int> alreadyCollidedDots;
+
           // For each leaf this rect is inside of
           for(int j=0; j<currLeafs.size(); j++){
             QuadTree* currLeaf = currLeafs[j];
@@ -134,11 +138,31 @@ int main(int, char**)
               dotsCheckedThisFrame++;
               Dot* other = currLeaf->points[k];
               if(&curr != &other){// if they're the same dot ignore
+                                  /*
                 // check if they're colliding and resolve it.
                 // for now, just detecting it.
-                bool collision = detectAndResolveCollision(curr, other); 
-                if(collision){
-                 collisionsThisFrame++; 
+                bool collision = detectAndResolveCollision(curr, other);
+
+                // Check count to ensure other hasn't been collided with
+                // already.
+                if(collision && std::count(
+                      alreadyCollidedDots.begin(), alreadyCollidedDots.end(), other->id
+                      ) == 0){
+                 collisionsThisFrame++;
+                 alreadyCollidedDots.push_back(other->id);
+                }
+                */
+                // Ensure other hasn't been collided with by this rect already.
+                if(std::count(
+                      alreadyCollidedDots.begin(), alreadyCollidedDots.end(), other->id
+                      ) == 0){
+                  // check if they're colliding and resolve it.
+                  // for now, just detecting it.
+                  bool collision = detectAndResolveCollision(curr, other);
+                  if(collision) {
+                    collisionsThisFrame++;
+                    alreadyCollidedDots.push_back(other->id);
+                  }
                 }
               }
             }

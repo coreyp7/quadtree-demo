@@ -1,7 +1,11 @@
 #include "Dot.h"
 
+int Dot::ID_COUNTER = 0;
+
 Dot::Dot(float x, float y, float w, float h) {
 	rect = new SDL_FRect{ x, y, w, h };
+  id = ID_COUNTER;
+  ID_COUNTER++;
 
 	// Set random velocity for square to move at.
 	xVel = (float)(rand()) / (float)(rand());
