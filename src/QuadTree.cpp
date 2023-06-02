@@ -1,6 +1,27 @@
 #include "QuadTree.h"
 
+
+//static int LIMIT = 4;
+//static int DEPTH_LIMIT = 5;
+
 QuadTree::QuadTree(float x, float y, float width, float height) {
+	nw = nullptr;
+	ne = nullptr;
+	sw = nullptr;
+	se = nullptr;
+	isLeaf = true;
+
+	this->x = x;
+	this->y = y;
+
+	this->width = width;
+	this->height = height;
+}
+
+QuadTree::QuadTree(float x, float y, float width, float height, int limit, int depthLimit) {
+  LIMIT = limit;
+  DEPTH_LIMIT = depthLimit;
+
 	nw = nullptr;
 	ne = nullptr;
 	sw = nullptr;
@@ -56,10 +77,10 @@ void QuadTree::insert(Dot* point) {
 			isLeaf = false;
 	
 			// TODO: could make this cleaner by precalculating width/height stuff.
-			nw = new QuadTree(x, y, width / 2, height / 2);
-			ne = new QuadTree(x + (width / 2), y, width / 2, height / 2);
-			sw = new QuadTree(x, y + (height / 2), width / 2, height / 2);
-			se = new QuadTree(x + (width / 2), y + (height / 2), width / 2, height / 2);
+			nw = new QuadTree(x, y, width / 2, height / 2, LIMIT, DEPTH_LIMIT);
+			ne = new QuadTree(x + (width / 2), y, width / 2, height / 2, LIMIT, DEPTH_LIMIT);
+			sw = new QuadTree(x, y + (height / 2), width / 2, height / 2, LIMIT, DEPTH_LIMIT);
+			se = new QuadTree(x + (width / 2), y + (height / 2), width / 2, height / 2, LIMIT, DEPTH_LIMIT);
       nw->depth = this->depth+1;
       ne->depth = this->depth+1;
       sw->depth = this->depth+1;

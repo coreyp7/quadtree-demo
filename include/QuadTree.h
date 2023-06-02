@@ -6,10 +6,12 @@
 class QuadTree {
 public:
 
+  // These settings are the best I've found so far.
+  int LIMIT, DEPTH_LIMIT;
 	//static const int LIMIT = 4;
   //static const int DEPTH_LIMIT = 5;
-	static const int LIMIT = 6;
-  static const int DEPTH_LIMIT = 5;
+	//static const int LIMIT = 6;
+  //static const int DEPTH_LIMIT = 5;
 
 	// Pointers to all children of this 'node'. 
 	QuadTree* nw;
@@ -32,6 +34,7 @@ public:
   int depth;
 
 	QuadTree(float x, float y, float width, float height);
+	QuadTree(float x, float y, float width, float height, int limit, int depthLimit);
 	~QuadTree();
 
 	void insert(Dot* point);

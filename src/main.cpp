@@ -18,6 +18,9 @@ int COUNT_SQUARED = COUNT*COUNT;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 
+static int quadTreeLimit = 4;
+static int quadTreeDepthLimit = 5;
+
 SDL_Renderer* renderer;
 SDL_Window* window;
 ImGuiIO io;
@@ -50,7 +53,10 @@ bool detectAndResolveCollision(Dot* rect1, Dot* rect2);
 // Main code
 int main(int, char**)
 {
-    QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    //int QuadTree::LIMIT = 4;
+    //int QuadTree::DEPTH_LIMIT = 5;
+    QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
+        quadTreeLimit, quadTreeDepthLimit);
     /*SDL_FPoint point1 = { 250, 250 };
     SDL_FPoint point2 = { 1050, 250 };
     SDL_FPoint point3 = { 950, 250 };
@@ -107,7 +113,8 @@ int main(int, char**)
 
         // Reconstruct QuadTree of all entities/rects
         qTree->~QuadTree();
-        qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
+        quadTreeLimit, quadTreeDepthLimit);
         for (int i = 0; i < dots.size(); i++) {
             qTree->insert(dots[i]);
         }
@@ -171,6 +178,11 @@ int main(int, char**)
         ImGui::Text(comparisonText.c_str());
         ImGui::Text(lazyText.c_str());
         ImGui::Text(collisionText.c_str());
+
+        // Sliders
+        ImGui::SliderInt("'Rect Limit' slider", &quadTreeLimit, 1, 12);
+        ImGui::SliderInt("'Depth Limit' slider", &quadTreeDepthLimit, 1, 12);
+
         ImGui::End();
         // MY WINDOW CREATED HERE
 
