@@ -47,7 +47,7 @@ void QuadTree::insert(Dot* point) {
 		// If so, then create our 4 quadtrees and insert
 		// all my points into my (appropriate) children.
 		if (points.size() >= LIMIT) {
-      if(depth >= 5){
+      if(depth >= 7){
         return; 
         // ignore; stop making new quadtrees to avoid stackoverflow.
         // these rects are probably colliding
@@ -158,6 +158,33 @@ void QuadTree::update() {
 		sw->update();
 		se->update();
 	}
+}
+
+std::vector<QuadTree*> QuadTree::getLeafs(Dot* dot){
+	// If not leaf; call getLeaf on children which contain rect.
+  // Else, return yourself in a vector.
+  std::vector<QuadTree*> trees;
+	if (!isLeaf) {
+		if (nw->insideOf(dot)) {
+      std::vector<QuadTree*> newTrees = nw->getLeafs(dot);
+      trees.insert(trees.end(), newTrees.begin(), newTrees.end());
+    }
+		if (ne->insideOf(dot)) {
+      std::vector<QuadTree*> newTrees = ne->getLeafs(dot);
+      trees.insert(trees.end(), newTrees.begin(), newTrees.end());
+		}
+		if (sw->insideOf(dot)) {
+			std::vector<QuadTree*> newTrees = sw->getLeafs(dot);
+      trees.insert(trees.end(), newTrees.begin(), newTrees.end());
+		}
+		if (se->insideOf(dot)) {
+			std::vector<QuadTree*> newTrees = se->getLeafs(dot);		
+      trees.insert(trees.end(), newTrees.begin(), newTrees.end());
+    }
+	} else {
+    trees.push_back(this);
+  }
+    return trees;
 }
 
 /*

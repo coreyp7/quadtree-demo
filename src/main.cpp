@@ -60,11 +60,12 @@ int main(int, char**)
 
     std::vector<Dot*> dots;
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 10; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
         //SDL_FPoint point = {numbX, numbY};
         Dot* dot = new Dot(numbX, numbY, 35, 35);
+        //Dot* dot = new Dot(numbX, numbY, 6, 6);
         qTree->insert(dot);
         dots.push_back(dot);
     }
@@ -73,8 +74,10 @@ int main(int, char**)
     dot->yVel = 500;
     qTree->insert(dot);
     dots.push_back(dot);*/
-    printf("Everything inserted.\n");
+    printf("Everything inserted.\n"); 
 
+    std::vector<QuadTree*> dot_contained_trees = qTree->getLeafs(dots[3]);
+    printf("Size: %i\n", dot_contained_trees.size());
 
     setup();
 

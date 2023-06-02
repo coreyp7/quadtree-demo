@@ -34,6 +34,8 @@ public:
 	void insert(Dot* point);
 
 	// For confirming if a point belongs in this QuadTree (square).
+  // TODO: should probably change this to be 'contains' or something
+  // less stupid.
 	bool insideOf(Dot* point);
 
 	// Will draw this entire QuadTree and all of its children.
@@ -41,4 +43,6 @@ public:
 	void draw(SDL_Renderer* renderer);
 
 	void update();
+
+  std::vector<QuadTree*> getLeafs(Dot* dot);
 };
