@@ -13,7 +13,8 @@
 #include "QuadTree.h"
 #include "Dot.h"
 
-const int COUNT = 1000;
+const int COUNT = 500;
+int COUNT_SQUARED = COUNT*COUNT;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 
@@ -61,7 +62,7 @@ int main(int, char**)
 
     std::vector<Dot*> dots;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < COUNT; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
         //SDL_FPoint point = {numbX, numbY};
@@ -159,9 +160,17 @@ int main(int, char**)
         //ImGui::Begin("Algorithm Visualizer");
         ImGui::Begin("Info");
         std::string comparisonText = "Number of comparisons this frame:";
-        //int testNumb = 32;
+        std::string lazyText = "Comparisons w/o tree (brute force):";
+        std::string countText = "Total:";
+        std::string collisionText = "Collisions this frame:";
+        collisionText += std::to_string(collisionsThisFrame);
+        countText += std::to_string(COUNT);
         comparisonText += std::to_string(dotsCheckedThisFrame);
+        lazyText += std::to_string(COUNT_SQUARED);
+        ImGui::Text(countText.c_str());
         ImGui::Text(comparisonText.c_str());
+        ImGui::Text(lazyText.c_str());
+        ImGui::Text(collisionText.c_str());
         ImGui::End();
         // MY WINDOW CREATED HERE
 

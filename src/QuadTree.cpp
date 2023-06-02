@@ -47,7 +47,7 @@ void QuadTree::insert(Dot* point) {
 		// If so, then create our 4 quadtrees and insert
 		// all my points into my (appropriate) children.
 		if (points.size() >= LIMIT) {
-      if(depth >= 7){
+      if(depth >= DEPTH_LIMIT){
         return; 
         // ignore; stop making new quadtrees to avoid stackoverflow.
         // these rects are probably colliding
@@ -127,7 +127,8 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 			//SDL_RenderDrawPoint(renderer, points[i].x, points[i].y);
 			//SDL_FRect frect = { points[i]->rect->x, points[i]->pos->y, 4, 4 };
 			//SDL_RenderDrawRectF(renderer, &frect);
-			SDL_RenderFillRectF(renderer, points[i]->rect);
+			//SDL_RenderFillRectF(renderer, points[i]->rect);
+      SDL_RenderDrawRectF(renderer, points[i]->rect);
 		}
 	}
 	else {
