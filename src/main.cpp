@@ -13,7 +13,7 @@
 #include "QuadTree.h"
 #include "Dot.h"
 
-const int COUNT = 5000;
+const int COUNT = 5;
 int COUNT_SQUARED = COUNT*COUNT;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
@@ -29,67 +29,30 @@ int setup();
 //void showImGui();
 bool detectAndResolveCollision(Dot* rect1, Dot* rect2);
 
-//int main(int, char**){
-//
-//	//// Make random array
-//	//int items[COUNT];
-//	//for (int i = 0; i < COUNT; i++) {
-//	//	int numb = rand() % 1000;
-//	//	items[i] = numb;
-//	//}
-//
-//	//printf("before:");
-//	//printArray(items, COUNT);
-//
-//	//sort(items, COUNT);
-//
-//	//printf("after:");
-//	//printArray(items, COUNT);
-//	//printf("Status: %s", (isSorted(items, COUNT)) ? "sorted" : "NOT SORTED");
-//
-//    return 0;
-//}
-
 // Main code
 int main(int, char**)
 {
-    //int QuadTree::LIMIT = 4;
-    //int QuadTree::DEPTH_LIMIT = 5;
     QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
         quadTreeLimit, quadTreeDepthLimit);
-    /*SDL_FPoint point1 = { 250, 250 };
-    SDL_FPoint point2 = { 1050, 250 };
-    SDL_FPoint point3 = { 950, 250 };
-    SDL_FPoint point4 = { 750, 250 };
-    qTree->insert(point1);
-    qTree->insert(point2);
-    qTree->insert(point3);
-    qTree->insert(point4);*/
 
+    // Rects that will exist in our tree.
     std::vector<Dot*> dots;
 
     for (int i = 0; i < COUNT; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
-        //SDL_FPoint point = {numbX, numbY};
-        //Dot* dot = new Dot(numbX, numbY, 35, 35);
-        Dot* dot = new Dot(numbX, numbY, 6, 6);
+        Dot* dot = new Dot(numbX, numbY, 35, 35);
+        //Dot* dot = new Dot(numbX, numbY, 6, 6);
         qTree->insert(dot);
         dots.push_back(dot);
     }
-    /*Dot* dot = new Dot(3, 3, 35, 35);
-    dot->xVel = 500;
-    dot->yVel = 500;
-    qTree->insert(dot);
-    dots.push_back(dot);*/
-    printf("Everything inserted.\n"); 
+    printf("Initial QuadTree setup.\n"); 
 
-    //std::vector<QuadTree*> dot_contained_trees = qTree->getLeafs(dots[3]);
-
-    //printf("Size: %i\n", dot_contained_trees.size());
-
+    // Sets up SDL and imgui
     setup();
 
+
+    // main game loop starts here
     float lastPhysicsUpdate = 0;
 
     SDL_Event event;
@@ -112,6 +75,8 @@ int main(int, char**)
         lastPhysicsUpdate = SDL_GetTicks();
 
         // Reconstruct QuadTree of all entities/rects
+        // TODO: Should just call an update function to do this internally
+        // so we don't have to construct one of these every frame.
         qTree->~QuadTree();
         qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
         quadTreeLimit, quadTreeDepthLimit);
@@ -129,6 +94,7 @@ int main(int, char**)
           // Keep tracks of rects collided with to avoid duplicates.
           std::vector<int> alreadyCollidedDots;
 
+          // TODO: put all this into a function.
           // For each leaf this rect is inside of
           for(int j=0; j<currLeafs.size(); j++){
             QuadTree* currLeaf = currLeafs[j];
@@ -137,7 +103,7 @@ int main(int, char**)
             for(int k=0; k<currLeaf->points.size(); k++){
               dotsCheckedThisFrame++;
               Dot* other = currLeaf->points[k];
-              if(&curr != &other){// if they're the same dot ignore
+              if(curr->id != other->id){// if they're the same dot ignore
                                   /*
                 // check if they're colliding and resolve it.
                 // for now, just detecting it.
@@ -152,10 +118,9 @@ int main(int, char**)
                  alreadyCollidedDots.push_back(other->id);
                 }
                 */
+
                 // Ensure other hasn't been collided with by this rect already.
-                if(std::count(
-                      alreadyCollidedDots.begin(), alreadyCollidedDots.end(), other->id
-                      ) == 0){
+                if(std::count(alreadyCollidedDots.begin(), alreadyCollidedDots.end(), other->id) == 0){
                   // check if they're colliding and resolve it.
                   // for now, just detecting it.
                   bool collision = detectAndResolveCollision(curr, other);
@@ -168,6 +133,8 @@ int main(int, char**)
             }
           }
         }
+
+
 
         // Rendering
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
