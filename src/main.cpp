@@ -1,6 +1,7 @@
 #include "sorting.h"
 #include <cstdlib>
 #include <cassert>
+#include <unordered_map>
 
 // sdl/imgui
 #include "imgui.h"
@@ -13,7 +14,7 @@
 #include "QuadTree.h"
 #include "Dot.h"
 
-const int COUNT = 5;
+const int COUNT = 50;
 int COUNT_SQUARED = COUNT*COUNT;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
@@ -84,6 +85,13 @@ int main(int, char**)
             qTree->insert(dots[i]);
         }
 
+        // Hashtable to keep track of collisions which have already happened.
+        // K: id of dot
+        // V: vector containing all ids which this id has already collided
+        // with.
+        // Leaving commented because I'm switching to different method.
+        //std::unordered_map<int, std::vector<int>> id_map;
+
         // Check/handle collisions of rects
         int collisionsThisFrame = 0;
         int dotsCheckedThisFrame = 0;
@@ -103,23 +111,12 @@ int main(int, char**)
             for(int k=0; k<currLeaf->points.size(); k++){
               dotsCheckedThisFrame++;
               Dot* other = currLeaf->points[k];
-              if(curr->id != other->id){// if they're the same dot ignore
-                                  /*
-                // check if they're colliding and resolve it.
-                // for now, just detecting it.
-                bool collision = detectAndResolveCollision(curr, other);
 
-                // Check count to ensure other hasn't been collided with
-                // already.
-                if(collision && std::count(
-                      alreadyCollidedDots.begin(), alreadyCollidedDots.end(), other->id
-                      ) == 0){
-                 collisionsThisFrame++;
-                 alreadyCollidedDots.push_back(other->id);
-                }
-                */
+              // if they're the same dot ignore checking this one
+              if(curr->id != other->id){
 
                 // Ensure other hasn't been collided with by this rect already.
+                // TODO: fix this counting every collision twice.
                 if(std::count(alreadyCollidedDots.begin(), alreadyCollidedDots.end(), other->id) == 0){
                   // check if they're colliding and resolve it.
                   // for now, just detecting it.
@@ -140,22 +137,19 @@ int main(int, char**)
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
+        // Render entire quadtree (and the rects contained in it)
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        /*SDL_Rect rect = { qTree->x, qTree->y, qTree->width, qTree->height };
-        SDL_RenderDrawRect(renderer, &rect);*/
         qTree->draw(renderer);
 
         // ImGui stuff
-        //showImGui();
-
         // MY WINDOW CREATED HERE
+        // TODO: Could move this back into a function/separate file.
         ImGui_ImplSDLRenderer_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
         bool show = true;
 
         ImGui::ShowDemoWindow(&show);
-        //ImGui::Begin("Algorithm Visualizer");
         ImGui::Begin("Info");
         std::string comparisonText = "Number of comparisons this frame:";
         std::string lazyText = "Comparisons w/o tree (brute force):";
@@ -192,146 +186,10 @@ int main(int, char**)
     SDL_DestroyWindow(window);
     SDL_Quit();
 
-    //Tree* tree = new Tree(5);
-    ///*for (int i = 0; i < 500; i++) {
-    //    int numb = rand() % 1000;
-    //    tree.insert(numb);
-    //}*/
-
-    ////tree.insert(3);
-    //tree->insert(6);
-    //tree->insert(87);
-    //tree->insert(73);
-    //tree->insert(543);
-    //tree->insert(47);
-    //tree->insert(3);
-
-    //printf(tree->to_string().c_str());
-    //printf("\n");
-
-    //tree->remove(87);
-    ////printf("%i\n", tree.searchTree(5)->value); // TODO: have search tree return tree value is in
-
-    //printf("%s\n", (tree->valid() ? "valid" : "INVALID BST"));
-    //printf("%i\n", tree->min()->value);
-    //printf("%i\n", tree->max()->value);
-
-    //printf(tree->to_string().c_str());
-
-
-
-//    // Setup SDL
-//    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
-//    {
-//        printf("Error: %s\n", SDL_GetError());
-//        return -1;
-//    }
-//
-//    // From 2.0.18: Enable native IME.
-//#ifdef SDL_HINT_IME_SHOW_UI
-//    SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-//#endif
-//
-//    // Create window with SDL_Renderer graphics context
-//    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-//    SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
-//    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-//    if (renderer == nullptr)
-//    {
-//        SDL_Log("Error creating SDL_Renderer!");
-//        return 0;
-//    }
-//    //SDL_RendererInfo info;
-//    //SDL_GetRendererInfo(renderer, &info);
-//    //SDL_Log("Current SDL_Renderer: %s", info.name);
-//
-//    // Setup Dear ImGui context
-//    IMGUI_CHECKVERSION();
-//    ImGui::CreateContext();
-//    ImGuiIO& io = ImGui::GetIO(); (void)io;
-//    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-//    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-//
-//    // Setup Dear ImGui style
-//    ImGui::StyleColorsDark();
-//    //ImGui::StyleColorsLight();
-//
-//    // Setup Platform/Renderer backends
-//    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-//    ImGui_ImplSDLRenderer_Init(renderer);
-//
-//    // Load Fonts
-//    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-//    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-//    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-//    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-//    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-//    // - Read 'docs/FONTS.md' for more instructions and details.
-//    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-//    //io.Fonts->AddFontDefault();
-//    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-//    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-//    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-//    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-//    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-//    //IM_ASSERT(font != nullptr);
-//
-//    // Our state
-//    bool show_demo_window = false;
-//    bool show_another_window = false;
-//    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-//
-//    // Make random array
-//	int arr[COUNT];
-//	for (int i = 0; i < COUNT; i++) {
-//		int numb = rand() % 1000;
-//		arr[i] = numb;
-//	}
-//
-//    // Main loop
-//    bool done = false;
-//    while (!done)
-//    {
-//        // Poll and handle events (inputs, window resize, etc.)
-//        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-//        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-//        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-//        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-//        SDL_Event event;
-//        while (SDL_PollEvent(&event))
-//        {
-//            ImGui_ImplSDL2_ProcessEvent(&event);
-//            if (event.type == SDL_QUIT)
-//                done = true;
-//            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-//                done = true;
-//        }
-//
-//
-//
-//        // Rendering
-//        showImGui();
-//        ImGui::Render();
-//        SDL_RenderSetScale(renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-//        //SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-//        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-//        SDL_RenderClear(renderer);
-//        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-//        SDL_RenderPresent(renderer);
-//    }
-//
-//    // Cleanup
-//    ImGui_ImplSDLRenderer_Shutdown();
-//    ImGui_ImplSDL2_Shutdown();
-//    ImGui::DestroyContext();
-//
-//    SDL_DestroyRenderer(renderer);
-//    SDL_DestroyWindow(window);
-//    SDL_Quit();
-
     return 0;
 }
 
+// old function for handling imgui window.
 void showImGui() {
     // Start the Dear ImGui frame
     ImGui_ImplSDLRenderer_NewFrame();
@@ -402,20 +260,48 @@ int setup() {
     return 0;
 }
 
-
-bool detectAndResolveCollision(Dot* dot1, Dot* dot2){
+bool checkCollision(Dot* dot1, Dot* dot2){
   SDL_FRect rect1 = *dot1->rect;
   SDL_FRect rect2 = *dot2->rect;
 
   bool xCollision = (((rect1.x + rect1.w) >= (rect2.x)) && ((rect2.x + rect2.w) >= (rect1.x)));
   bool yCollision = (((rect1.y + rect1.h) >= (rect2.y)) && ((rect2.y + rect2.h) >= (rect1.y)));
-  
-  // If theres a collision, resolve it here.
-  /*
-  if(xCollision && yCollision){
-    
-  }
-  */
+
   return xCollision && yCollision;
+}
+
+bool detectAndResolveCollision(Dot* dot1, Dot* dot2){
+  bool collision = checkCollision(dot1, dot2);
+  SDL_FRect rect1 = *dot1->rect;
+  SDL_FRect rect2 = *dot2->rect;
+
+  if(collision){
+    // find out which axis is easier to resolve (recall warehouse escape) 
+    // should be fine for this i think.
+    // First figure out which side the collision is happening relative to dot1.
+    float xDist, yDist;
+    if(rect1.x < rect2.x){
+      xDist = ((rect1.x + rect1.w) - rect2.x);
+    } else {
+      xDist = ((rect2.x + rect2.w) - rect1.x);
+    }
+
+    if(rect1.y < rect2.y){
+      yDist = ((rect1.y + rect1.h) - rect2.y);
+    } else {
+      yDist = ((rect2.y + rect2.h) - rect1.y);
+    }
+
+    if(xDist > yDist){
+      dot1->yVel = -dot1->yVel; 
+      dot2->yVel = -dot2->yVel; 
+      printf("yvel flipped\n");
+    } else {
+      dot1->xVel = -dot1->xVel;
+      dot2->xVel = -dot2->xVel;
+      printf("xvel flipped\n");
+    }
+  }
+  return collision;
 }
 
