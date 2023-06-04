@@ -1,8 +1,8 @@
-#include "Dot.h"
+#include "Entity.h"
 
-int Dot::ID_COUNTER = 0;
+int Entity::ID_COUNTER = 0;
 
-Dot::Dot(float x, float y, float w, float h) {
+Entity::Entity(float x, float y, float w, float h) {
 	rect = new SDL_FRect{ x, y, w, h };
   id = ID_COUNTER;
   ID_COUNTER++;
@@ -15,11 +15,11 @@ Dot::Dot(float x, float y, float w, float h) {
 
 }
 
-Dot::~Dot() {
+Entity::~Entity() {
 	delete rect;
 }
 
-void Dot::simulate(float dt) {
+void Entity::simulate(float dt) {
 	float oldX = rect->x;
 	float oldY = rect->y;
 

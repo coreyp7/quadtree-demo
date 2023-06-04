@@ -12,7 +12,7 @@
 
 #include "Tree.h"
 #include "QuadTree.h"
-#include "Dot.h"
+#include "Entity.h"
 
 // TODO: add slider to allow changing the amount of rects in the quadtree.
 const int COUNT = 50;
@@ -26,22 +26,21 @@ ImGuiIO io; // idk what this is for rn, but imgui needs it
 
 int setup();
 //void showImGui();
-bool detectAndResolveCollision(Dot* rect1, Dot* rect2);
+bool detectAndResolveCollision(Entity* rect1, Entity* rect2);
 
 // Main code
 int main(int, char**)
 {
     QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//,
-        //quadTreeLimit, quadTreeDepthLimit);
 
     // Rects that will exist in our tree.
-    std::vector<Dot*> dots;
+    std::vector<Entity*> dots;
 
     for (int i = 0; i < COUNT; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
-        Dot* dot = new Dot(numbX, numbY, 35, 35);
-        //Dot* dot = new Dot(numbX, numbY, 6, 6);
+        Entity* dot = new Entity(numbX, numbY, 35, 35);
+        //Entity* dot = new Entity(numbX, numbY, 6, 6);
         qTree->insert(dot);
         dots.push_back(dot);
     }
@@ -94,7 +93,7 @@ int main(int, char**)
         int collisionsThisFrame = 0;
         int dotsCheckedThisFrame = 0;
         for(int i=0; i<dots.size(); i++){
-          Dot* curr = dots[i];
+          Entity* curr = dots[i];
           std::vector<QuadTree*> currLeafs = qTree->getLeafs(curr);
 
           // Keep tracks of rects collided with to avoid duplicates.
@@ -108,7 +107,7 @@ int main(int, char**)
             // and check for collision with 'curr' rect.
             for(int k=0; k<currLeaf->points.size(); k++){
               dotsCheckedThisFrame++;
-              Dot* other = currLeaf->points[k];
+              Entity* other = currLeaf->points[k];
 
               // if they're the same dot ignore checking this one
               if(curr->id != other->id){
@@ -258,7 +257,7 @@ int setup() {
     return 0;
 }
 
-bool checkCollision(Dot* dot1, Dot* dot2){
+bool checkCollision(Entity* dot1, Entity* dot2){
   SDL_FRect rect1 = *dot1->rect;
   SDL_FRect rect2 = *dot2->rect;
 
@@ -268,7 +267,7 @@ bool checkCollision(Dot* dot1, Dot* dot2){
   return xCollision && yCollision;
 }
 
-bool detectAndResolveCollision(Dot* dot1, Dot* dot2){
+bool detectAndResolveCollision(Entity* dot1, Entity* dot2){
   bool collision = checkCollision(dot1, dot2);
   SDL_FRect rect1 = *dot1->rect;
   SDL_FRect rect2 = *dot2->rect;

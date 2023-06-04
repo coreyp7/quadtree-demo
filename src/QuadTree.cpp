@@ -18,24 +18,6 @@ QuadTree::QuadTree(float x, float y, float width, float height) {
 	this->height = height;
 }
 
-/*
-QuadTree::QuadTree(float x, float y, float width, float height, int limit, int depthLimit) {
-  LIMIT = limit;
-  DEPTH_LIMIT = depthLimit;
-
-	nw = nullptr;
-	ne = nullptr;
-	sw = nullptr;
-	se = nullptr;
-	isLeaf = true;
-
-	this->x = x;
-	this->y = y;
-
-	this->width = width;
-	this->height = height;
-}
-*/
 QuadTree::~QuadTree() {
 	if (!isLeaf) {
 		delete nw;
@@ -45,7 +27,7 @@ QuadTree::~QuadTree() {
 	}
 }
 
-void QuadTree::insert(Dot* point) {
+void QuadTree::insert(Entity* point) {
 
 	// First check if this isn't a leaf node.
 	if (!isLeaf) {
@@ -116,7 +98,7 @@ void QuadTree::insert(Dot* point) {
 }
 
 // Check if an entity is inside of this QuadTree.
-bool QuadTree::insideOf(Dot* point) {
+bool QuadTree::insideOf(Entity* point) {
 	SDL_FRect* rect = point->rect;
 
 	bool colX = ((rect->x + rect->w) >= x) && ((x + width) >= rect->x);
@@ -175,9 +157,9 @@ void QuadTree::update() {
 	}
 }
 
-// Will return all leafs which the passed in object (currently a Dot)
+// Will return all leafs which the passed in object (currently a Entity)
 // is contained in. (An object can be in more than one leaf at a time).
-std::vector<QuadTree*> QuadTree::getLeafs(Dot* dot){
+std::vector<QuadTree*> QuadTree::getLeafs(Entity* dot){
 	// If not leaf; call getLeaf on children which contain rect.
   // Else, return yourself in a vector.
   std::vector<QuadTree*> trees;

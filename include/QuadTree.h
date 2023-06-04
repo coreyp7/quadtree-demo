@@ -1,7 +1,7 @@
 #pragma once
 #include <SDL.h> // using only for certain structs
 #include <vector>
-#include "Dot.h"
+#include "Entity.h"
 
 class QuadTree {
 public:
@@ -25,7 +25,7 @@ public:
 
   // Entities inside this QuadTree.
   // NOTE: only contains entities if isLeaf==true.
-	std::vector<Dot*> points;
+	std::vector<Entity*> points;
 
 	// Position of this QuadTree square (from top left).
 	int x, y, width, height;
@@ -37,12 +37,12 @@ public:
 	QuadTree(float x, float y, float width, float height);
 	~QuadTree();
 
-	void insert(Dot* point);
+	void insert(Entity* point);
 
 	// For confirming if a point belongs in this QuadTree (square).
   // TODO: should probably change this to be 'contains' or something
   // less stupid.
-	bool insideOf(Dot* point);
+	bool insideOf(Entity* point);
 
 	// Will draw this entire QuadTree and all of its children.
 	// (Will also draw the points).
@@ -50,5 +50,5 @@ public:
 
 	void update();
 
-  std::vector<QuadTree*> getLeafs(Dot* dot);
+  std::vector<QuadTree*> getLeafs(Entity* dot);
 };

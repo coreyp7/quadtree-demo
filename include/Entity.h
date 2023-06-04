@@ -2,10 +2,9 @@
 #include <SDL.h>
 #include <cstdlib>
 
-class Dot {
+class Entity {
 public:
-	// This class is basically a wrapper around
-	// this SDL_FPoint.
+	// Hitbox of the entity.
 	SDL_FRect* rect;
 
 	const static int SPEED = 10;
@@ -21,8 +20,8 @@ public:
  
   int id;
 
-	Dot(float x, float y, float w, float h);
-	~Dot();
+	Entity(float x, float y, float w, float h);
+	~Entity();
 
 	void simulate(float dt);
 
