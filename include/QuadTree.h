@@ -7,11 +7,11 @@ class QuadTree {
 public:
 
   // These settings are the best I've found so far.
-  int LIMIT, DEPTH_LIMIT;
-	//static const int LIMIT = 4;
-  //static const int DEPTH_LIMIT = 5;
-	//static const int LIMIT = 6;
-  //static const int DEPTH_LIMIT = 5;
+  // LIMIT=4, DEPTH_LIMIT=5.
+
+  // LIMIT: max count of rects in a QuadTree
+  // DEPTH_LIMIT: maximum depth that an entire QuadTree can have.
+  static int LIMIT, DEPTH_LIMIT;
 
 	// Pointers to all children of this 'node'. 
 	QuadTree* nw;
@@ -19,22 +19,22 @@ public:
 	QuadTree* sw;
 	QuadTree* se;
 
-	// Leaving for convenience to easily check if this is a leaf (and thus, all children references are nullptr).
+	// Leaving for convenience to easily check if this is a leaf 
+  // (and thus, all children references are nullptr).
 	bool isLeaf;
 
-	// TEMPORARY: will contain squares later. Getting it working with points first because its easier to think about.
-	// Also, I haven't figured out if points which are in the children appear here; will determine during implementation.
+  // Entities inside this QuadTree.
+  // NOTE: only contains entities if isLeaf==true.
 	std::vector<Dot*> points;
 
 	// Position of this QuadTree square (from top left).
 	int x, y, width, height;
 
   // Used to determine "how deep" we are down the tree.
-  // If its > 5, stop; don't create any more leaf nodes.
+  // Maximum depth is specified by static DEPTH_LIMIT.
   int depth;
 
 	QuadTree(float x, float y, float width, float height);
-	QuadTree(float x, float y, float width, float height, int limit, int depthLimit);
 	~QuadTree();
 
 	void insert(Dot* point);

@@ -14,17 +14,15 @@
 #include "QuadTree.h"
 #include "Dot.h"
 
+// TODO: add slider to allow changing the amount of rects in the quadtree.
 const int COUNT = 50;
 int COUNT_SQUARED = COUNT*COUNT;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 
-static int quadTreeLimit = 4;
-static int quadTreeDepthLimit = 5;
-
 SDL_Renderer* renderer;
 SDL_Window* window;
-ImGuiIO io;
+ImGuiIO io; // idk what this is for rn, but imgui needs it
 
 int setup();
 //void showImGui();
@@ -33,8 +31,8 @@ bool detectAndResolveCollision(Dot* rect1, Dot* rect2);
 // Main code
 int main(int, char**)
 {
-    QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
-        quadTreeLimit, quadTreeDepthLimit);
+    QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//,
+        //quadTreeLimit, quadTreeDepthLimit);
 
     // Rects that will exist in our tree.
     std::vector<Dot*> dots;
@@ -79,8 +77,8 @@ int main(int, char**)
         // TODO: Should just call an update function to do this internally
         // so we don't have to construct one of these every frame.
         qTree->~QuadTree();
-        qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
-        quadTreeLimit, quadTreeDepthLimit);
+        qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//,
+        //quadTreeLimit, quadTreeDepthLimit);
         for (int i = 0; i < dots.size(); i++) {
             qTree->insert(dots[i]);
         }
@@ -165,8 +163,8 @@ int main(int, char**)
         ImGui::Text(collisionText.c_str());
 
         // Sliders
-        ImGui::SliderInt("'Rect Limit' slider", &quadTreeLimit, 1, 12);
-        ImGui::SliderInt("'Depth Limit' slider", &quadTreeDepthLimit, 1, 12);
+        ImGui::SliderInt("'Rect Limit' slider", &QuadTree::LIMIT, 1, 12);
+        ImGui::SliderInt("'Depth Limit' slider", &QuadTree::DEPTH_LIMIT, 1, 12);
 
         ImGui::End();
         // MY WINDOW CREATED HERE
@@ -295,11 +293,9 @@ bool detectAndResolveCollision(Dot* dot1, Dot* dot2){
     if(xDist > yDist){
       dot1->yVel = -dot1->yVel; 
       dot2->yVel = -dot2->yVel; 
-      printf("yvel flipped\n");
     } else {
       dot1->xVel = -dot1->xVel;
       dot2->xVel = -dot2->xVel;
-      printf("xvel flipped\n");
     }
   }
   return collision;

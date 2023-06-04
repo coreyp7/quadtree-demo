@@ -1,8 +1,8 @@
 #include "QuadTree.h"
 
-
-//static int LIMIT = 4;
-//static int DEPTH_LIMIT = 5;
+// Set defaults to static limit stuff (these are good values I've found).
+int QuadTree::LIMIT = 4;
+int QuadTree::DEPTH_LIMIT = 5;
 
 QuadTree::QuadTree(float x, float y, float width, float height) {
 	nw = nullptr;
@@ -18,6 +18,7 @@ QuadTree::QuadTree(float x, float y, float width, float height) {
 	this->height = height;
 }
 
+/*
 QuadTree::QuadTree(float x, float y, float width, float height, int limit, int depthLimit) {
   LIMIT = limit;
   DEPTH_LIMIT = depthLimit;
@@ -34,7 +35,7 @@ QuadTree::QuadTree(float x, float y, float width, float height, int limit, int d
 	this->width = width;
 	this->height = height;
 }
-
+*/
 QuadTree::~QuadTree() {
 	if (!isLeaf) {
 		delete nw;
@@ -77,10 +78,11 @@ void QuadTree::insert(Dot* point) {
 			isLeaf = false;
 	
 			// TODO: could make this cleaner by precalculating width/height stuff.
-			nw = new QuadTree(x, y, width / 2, height / 2, LIMIT, DEPTH_LIMIT);
-			ne = new QuadTree(x + (width / 2), y, width / 2, height / 2, LIMIT, DEPTH_LIMIT);
-			sw = new QuadTree(x, y + (height / 2), width / 2, height / 2, LIMIT, DEPTH_LIMIT);
-			se = new QuadTree(x + (width / 2), y + (height / 2), width / 2, height / 2, LIMIT, DEPTH_LIMIT);
+			nw = new QuadTree(x, y, width / 2, height / 2);
+			ne = new QuadTree(x + (width / 2), y, width / 2, height / 2);
+			sw = new QuadTree(x, y + (height / 2), width / 2, height / 2);
+			se = new QuadTree(x + (width / 2), y + (height / 2), width / 2, height / 2);
+      //TODO: make this less stupid if you feel it neccessary.
       nw->depth = this->depth+1;
       ne->depth = this->depth+1;
       sw->depth = this->depth+1;
@@ -106,26 +108,16 @@ void QuadTree::insert(Dot* point) {
 					se->insert(points[i]);
 				}
 			}
-			// I'm not sure if I'm supposed to do this, but
-			// am going with it for now because it makes
-			// more intuitive sense to me. 
-			// (aka leafs can only have points).
+      // Leafs can only have points. This is no longer a leaf, so clear our
+      // points.
 			points.clear();
 		}
 	}
 }
 
+// Check if an entity is inside of this QuadTree.
 bool QuadTree::insideOf(Dot* point) {
 	SDL_FRect* rect = point->rect;
-
-	/*if ((pos->x < (x + width) && pos->x > x)
-		&& (pos->y < (y + height) && pos->y > y)) {
-		return true;
-	}
-	return false;*/
-
-	//bool collisionX = rect->x <= x + width && rect->x + rect->w <= x;
-	//bool collisionY = rect->y <= y + height && rect->y + rect->h <= y;
 
 	bool colX = ((rect->x + rect->w) >= x) && ((x + width) >= rect->x);
 	bool colY = ((rect->y + rect->h) >= y) && ((y + height) >= rect->y);
@@ -160,6 +152,7 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 	}
 }
 
+// @unfinished.
 void QuadTree::update() {
 	/*
 	* NOTE: at some point I'm going to have to check if
@@ -182,6 +175,8 @@ void QuadTree::update() {
 	}
 }
 
+// Will return all leafs which the passed in object (currently a Dot)
+// is contained in. (An object can be in more than one leaf at a time).
 std::vector<QuadTree*> QuadTree::getLeafs(Dot* dot){
 	// If not leaf; call getLeaf on children which contain rect.
   // Else, return yourself in a vector.
@@ -209,20 +204,3 @@ std::vector<QuadTree*> QuadTree::getLeafs(Dot* dot){
     return trees;
 }
 
-/*
-* What's next?
-* 
-* I wrote an insert function (unsure of correctness) and a 
-* draw function (unsure of correctness).
-* 
-* draw() shows two initial points added in their own squares
-* seemingly correctly. Once two more are added (which are
-* intentionally around one of the first two points), then
-* it stops drawing the points for some reason.
-* 
-* Briefly debugged and didn't really see wtf was going on.
-* 
-* Debug this and have it draw correctly/insert correctly.
-* (Sorry its not as fun as yesterdays, but it'll be
-* satisfying to see it working with a lot of points.)
-*/
