@@ -15,7 +15,7 @@
 #include "Entity.h"
 
 // TODO: add slider to allow changing the amount of rects in the quadtree.
-const int COUNT = 50;
+const int COUNT = 500;
 int COUNT_SQUARED = COUNT*COUNT;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
@@ -36,13 +36,15 @@ int main(int, char**)
     // Rects that will exist in our tree.
     std::vector<Entity*> dots;
 
+    int entSize = 35;
     for (int i = 0; i < COUNT; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
-        Entity* dot = new Entity(numbX, numbY, 35, 35);
+        float size = rand() % entSize;
+        Entity* entity = new Entity(numbX, numbY, size, size);
         //Entity* dot = new Entity(numbX, numbY, 6, 6);
-        qTree->insert(dot);
-        dots.push_back(dot);
+        qTree->insert(entity);
+        dots.push_back(entity);
     }
     printf("Initial QuadTree setup.\n"); 
 
@@ -153,17 +155,18 @@ int main(int, char**)
         std::string countText = "Total:";
         std::string collisionText = "Collisions this frame:";
         collisionText += std::to_string(collisionsThisFrame);
-        countText += std::to_string(COUNT);
+        countText += std::to_string(dots.size());
         comparisonText += std::to_string(dotsCheckedThisFrame);
-        lazyText += std::to_string(COUNT_SQUARED);
+        lazyText += std::to_string(dots.size()*dots.size());
         ImGui::Text(countText.c_str());
         ImGui::Text(comparisonText.c_str());
         ImGui::Text(lazyText.c_str());
         ImGui::Text(collisionText.c_str());
+        ImGui::Button("Delete all");
 
         // Sliders
-        ImGui::SliderInt("'Rect Limit' slider", &QuadTree::LIMIT, 1, 12);
-        ImGui::SliderInt("'Depth Limit' slider", &QuadTree::DEPTH_LIMIT, 1, 12);
+        ImGui::SliderInt("'Entity Limit':", &QuadTree::LIMIT, 0, 9);
+        ImGui::SliderInt("'QuadTree Depth Limit':", &QuadTree::DEPTH_LIMIT, 0, 9);
 
         ImGui::End();
         // MY WINDOW CREATED HERE
