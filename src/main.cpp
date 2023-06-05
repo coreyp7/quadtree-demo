@@ -65,6 +65,15 @@ int main(int, char**)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
+            if (event.type == SDL_MOUSEBUTTONDOWN){
+              int xMousePos = event.button.x;
+              int yMousePos = event.button.y;
+
+              // Spawn an entity at position of mouseclick.
+              float size = rand() % entSize;
+              Entity* entity = new Entity(xMousePos, yMousePos, size, size);
+              dots.push_back(entity);
+            }
         }
 
         // Simulate game state (motion of rects)
@@ -178,6 +187,9 @@ int main(int, char**)
     }
 
     // Cleanup
+    qTree->~QuadTree();
+    //while(!dots.empty()) delete dots.front(), dots.pop_back();
+
     ImGui_ImplSDLRenderer_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
