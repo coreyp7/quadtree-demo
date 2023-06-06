@@ -14,12 +14,11 @@
 #include "QuadTree.h"
 #include "Entity.h"
 
-// TODO: add slider to allow changing the amount of rects in the quadtree.
-const int COUNT = 500;
-int COUNT_SQUARED = COUNT*COUNT;
+const int DEFAULT_COUNT = 500;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 
+// Globals because this is a demo project to implement a QuadTree.
 SDL_Renderer* renderer;
 SDL_Window* window;
 ImGuiIO io; // idk what this is for rn, but imgui needs it
@@ -33,27 +32,24 @@ int main(int, char**)
 {
     QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//,
 
-    // TODO: rename to something less shit.
-    // Rects that will exist in our tree.
-    std::vector<Entity*> dots;
+    // Entities (rects) that will exist in our tree.
+    std::vector<Entity*> entities;
 
     int entSize = 35;
-    for (int i = 0; i < COUNT; i++) {
+    for (int i = 0; i < DEFAULT_COUNT; i++) {
         float numbX = rand() % WINDOW_WIDTH;
         float numbY = rand() % WINDOW_HEIGHT;
         float size = rand() % entSize;
         Entity* entity = new Entity(numbX, numbY, size, size);
-        //Entity* dot = new Entity(numbX, numbY, 6, 6);
         qTree->insert(entity);
-        dots.push_back(entity);
+        entities.push_back(entity);
     }
     printf("Initial QuadTree setup.\n"); 
 
     // Sets up SDL and imgui
     setup();
 
-
-    // main game loop starts here
+    // Main game loop starts here
     float lastPhysicsUpdate = 0;
 
     SDL_Event event;
@@ -73,14 +69,15 @@ int main(int, char**)
               // Spawn an entity at position of mouseclick.
               float size = rand() % entSize;
               Entity* entity = new Entity(xMousePos, yMousePos, size, size);
-              dots.push_back(entity);
+              entities.push_back(entity);
             }
         }
 
-        // Simulate game state (motion of rects)
+        // Simulate game state (motion of entities).
+        // Use delta time to make motion consistent.
         float dt = (SDL_GetTicks() - lastPhysicsUpdate)/1000;
-        for (int i = 0; i < dots.size(); i++) {
-            dots[i]->simulate(dt);
+        for (int i = 0; i < entities.size(); i++) {
+            entities[i]->simulate(dt);
         }
         lastPhysicsUpdate = SDL_GetTicks();
 
@@ -88,53 +85,41 @@ int main(int, char**)
         // TODO: Should just call an update function to do this internally
         // so we don't have to construct one of these every frame.
         qTree->~QuadTree();
-        qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//,
-        //quadTreeLimit, quadTreeDepthLimit);
-        for (int i = 0; i < dots.size(); i++) {
-            qTree->insert(dots[i]);
+        qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        for (int i = 0; i < entities.size(); i++) {
+            qTree->insert(entities[i]);
         }
-
-        // Hashtable to keep track of collisions which have already happened.
-        // K: id of dot
-        // V: vector containing all ids which this id has already collided
-        // with.
-        // Leaving commented because I'm switching to different method.
-        //std::unordered_map<int, std::vector<int>> id_map;
 
         // TODO: put this into a function or something to make it easier to
         // stomach.
         // Check/handle collisions of rects
         int collisionsThisFrame = 0;
-        int dotsCheckedThisFrame = 0;
-        for(int i=0; i<dots.size(); i++){
-          Entity* curr = dots[i];
+        int entitiesCheckedThisFrame = 0;
+        for(int i=0; i<entities.size(); i++){
+          Entity* curr = entities[i];
           std::vector<QuadTree*> currLeafs = qTree->getLeafs(curr);
 
           // Keep tracks of rects collided with to avoid duplicates.
-          std::vector<int> alreadyCollidedDots;
+          std::vector<int> alreadyCollidedEntities;
 
-          // TODO: put all this into a function.
           // For each leaf this rect is inside of
           for(int j=0; j<currLeafs.size(); j++){
             QuadTree* currLeaf = currLeafs[j];
             // Iterate through other rects inside of this leaf
             // and check for collision with 'curr' rect.
             for(int k=0; k<currLeaf->points.size(); k++){
-              dotsCheckedThisFrame++;
+              entitiesCheckedThisFrame++;
               Entity* other = currLeaf->points[k];
 
-              // if they're the same dot ignore checking this one
+              // if they're the same entity ignore checking this one
               if(curr->id != other->id){
 
                 // Ensure other hasn't been collided with by this rect already.
-                // TODO: fix this counting every collision twice.
-                if(std::count(alreadyCollidedDots.begin(), alreadyCollidedDots.end(), other->id) == 0){
-                  // check if they're colliding and resolve it.
-                  // for now, just detecting it.
+                if(std::count(alreadyCollidedEntities.begin(), alreadyCollidedEntities.end(), other->id) == 0){
                   bool collision = detectAndResolveCollision(curr, other);
                   if(collision) {
                     collisionsThisFrame++;
-                    alreadyCollidedDots.push_back(other->id);
+                    alreadyCollidedEntities.push_back(other->id);
                   }
                 }
               }
@@ -148,7 +133,6 @@ int main(int, char**)
         collisionsThisFrame = collisionsThisFrame / 2;
 
         // Rendering //
-
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
@@ -156,8 +140,7 @@ int main(int, char**)
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         qTree->draw(renderer);
 
-        showImGui(collisionsThisFrame, dots.size(), dotsCheckedThisFrame, dots.size()*dots.size());
-
+        showImGui(collisionsThisFrame, entities.size(), entitiesCheckedThisFrame, entities.size()*entities.size());
 
         SDL_RenderPresent(renderer);
     }
@@ -262,6 +245,7 @@ int setup() {
     return 0;
 }
 
+// TODO: dot is leftover from early version with pixels instead of rects.
 bool checkCollision(Entity* dot1, Entity* dot2){
   SDL_FRect rect1 = *dot1->rect;
   SDL_FRect rect2 = *dot2->rect;
