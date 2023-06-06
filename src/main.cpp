@@ -25,7 +25,7 @@ SDL_Window* window;
 ImGuiIO io; // idk what this is for rn, but imgui needs it
 
 int setup();
-//void showImGui();
+void showImGui(int collisions, int entityCount, int checksThisFrame, int total);
 bool detectAndResolveCollision(Entity* rect1, Entity* rect2);
 
 // Main code
@@ -33,6 +33,7 @@ int main(int, char**)
 {
     QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//,
 
+    // TODO: rename to something less shit.
     // Rects that will exist in our tree.
     std::vector<Entity*> dots;
 
@@ -100,6 +101,8 @@ int main(int, char**)
         // Leaving commented because I'm switching to different method.
         //std::unordered_map<int, std::vector<int>> id_map;
 
+        // TODO: put this into a function or something to make it easier to
+        // stomach.
         // Check/handle collisions of rects
         int collisionsThisFrame = 0;
         int dotsCheckedThisFrame = 0;
@@ -139,55 +142,29 @@ int main(int, char**)
           }
         }
 
+        // Demo just detects collisions and no physics handling, so I don't
+        // differentiate the same collision from both entities' perspective.
+        // So just divide by 2 to show correct amount of collisions.
+        collisionsThisFrame = collisionsThisFrame / 2;
 
+        // Rendering //
 
-        // Rendering
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
-        // Render entire quadtree (and the rects contained in it)
+        // Render entire quadtree (and the entities contained in it)
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         qTree->draw(renderer);
 
-        // ImGui stuff
-        // MY WINDOW CREATED HERE
-        // TODO: Could move this back into a function/separate file.
-        ImGui_ImplSDLRenderer_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-        bool show = true;
+        showImGui(collisionsThisFrame, dots.size(), dotsCheckedThisFrame, dots.size()*dots.size());
 
-        ImGui::ShowDemoWindow(&show);
-        ImGui::Begin("Info");
-        std::string comparisonText = "Number of comparisons this frame:";
-        std::string lazyText = "Comparisons w/o tree (brute force):";
-        std::string countText = "Total:";
-        std::string collisionText = "Collisions this frame:";
-        collisionText += std::to_string(collisionsThisFrame);
-        countText += std::to_string(dots.size());
-        comparisonText += std::to_string(dotsCheckedThisFrame);
-        lazyText += std::to_string(dots.size()*dots.size());
-        ImGui::Text(countText.c_str());
-        ImGui::Text(comparisonText.c_str());
-        ImGui::Text(lazyText.c_str());
-        ImGui::Text(collisionText.c_str());
-        ImGui::Button("Delete all");
-
-        // Sliders
-        ImGui::SliderInt("'Entity Limit':", &QuadTree::LIMIT, 0, 9);
-        ImGui::SliderInt("'QuadTree Depth Limit':", &QuadTree::DEPTH_LIMIT, 0, 9);
-
-        ImGui::End();
-        // MY WINDOW CREATED HERE
-
-        ImGui::Render();
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 
         SDL_RenderPresent(renderer);
     }
 
     // Cleanup
     qTree->~QuadTree();
+    //TODO: figure this shit out.
     //while(!dots.empty()) delete dots.front(), dots.pop_back();
 
     ImGui_ImplSDLRenderer_Shutdown();
@@ -201,33 +178,46 @@ int main(int, char**)
     return 0;
 }
 
-// old function for handling imgui window.
-void showImGui() {
-    // Start the Dear ImGui frame
+// TODO: could make this better, but not a priority.
+// Parameters are all the stuff ImGui needs to display not in scope.
+void showImGui(int collisions, int entityCount, int checksThisFrame, int total) {
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     bool show = true;
 
     ImGui::ShowDemoWindow(&show);
-    //ImGui::Begin("Algorithm Visualizer");
     ImGui::Begin("Info");
+    std::string comparisonText = "Number of comparisons this frame:";
+    std::string lazyText = "Comparisons w/o tree (brute force):";
+    std::string countText = "Total:";
+    std::string collisionText = "Collisions this frame:";
 
-    /*
-    const char* items[] = { "Selection Sort", "Merge Sort", "etc" };
-    static int item_current = 1;
-    ImGui::ListBox("Pick algorithm", &item_current, items, IM_ARRAYSIZE(items), 4);
+    collisionText += std::to_string(collisions);
+    countText += std::to_string(entityCount);
+    comparisonText += std::to_string(checksThisFrame);
+    lazyText += std::to_string(total);
 
-    if (ImGui::Button("Start")) {
-        //selectionSort(arr, COUNT);
-        //printArray(arr, COUNT);
-        //printf("Status: %s", (isSorted(arr, COUNT)) ? "sorted" : "NOT SORTED");
-    }
-    */
+    ImGui::Text(countText.c_str());
+    ImGui::Text(comparisonText.c_str());
+    ImGui::Text(lazyText.c_str());
+    ImGui::Text(collisionText.c_str());
+    ImGui::Button("Delete all");
+
+    // Sliders which change the value of static ints in QuadTree
+    // which limit QuadTree max depth and max entities per leaf.
+    ImGui::SliderInt("'Entity Limit':", &QuadTree::LIMIT, 0, 9);
+    ImGui::SliderInt("'QuadTree Depth Limit':", &QuadTree::DEPTH_LIMIT, 0, 9);
+
     ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 }
 
-/* Setup required for sdl and imgui. */
+/* Setup required for sdl and imgui.
+ * Mostly just ripped from the example imgui provides.
+ */
 int setup() {
     // Setup SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -282,6 +272,9 @@ bool checkCollision(Entity* dot1, Entity* dot2){
   return xCollision && yCollision;
 }
 
+// TODO: remove this and just use collision function above,
+// I'm not resolving this shit in this project, will save for
+// the game I make to try and decouple physics in its own module.
 bool detectAndResolveCollision(Entity* dot1, Entity* dot2){
   bool collision = checkCollision(dot1, dot2);
   SDL_FRect rect1 = *dot1->rect;
