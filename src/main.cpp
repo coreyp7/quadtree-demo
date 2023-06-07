@@ -18,7 +18,7 @@ const int DEFAULT_COUNT = 500;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 
-// Globals because this is a demo project to implement a QuadTree.
+// Globals because this just a demo project to implement a QuadTree.
 SDL_Renderer* renderer;
 SDL_Window* window;
 ImGuiIO io; // idk what this is for rn, but imgui needs it
@@ -26,6 +26,7 @@ ImGuiIO io; // idk what this is for rn, but imgui needs it
 int setup();
 void showImGui(int collisions, int entityCount, int checksThisFrame, int total);
 bool detectAndResolveCollision(Entity* rect1, Entity* rect2);
+void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities, int* collisionsThisFrame, int* entitiesCheckedThisFrame);
 
 // Main code
 int main(int, char**)
@@ -90,42 +91,9 @@ int main(int, char**)
             qTree->insert(entities[i]);
         }
 
-        // TODO: put this into a function or something to make it easier to
-        // stomach.
-        // Check/handle collisions of rects
         int collisionsThisFrame = 0;
         int entitiesCheckedThisFrame = 0;
-        for(int i=0; i<entities.size(); i++){
-          Entity* curr = entities[i];
-          std::vector<QuadTree*> currLeafs = qTree->getLeafs(curr);
-
-          // Keep tracks of rects collided with to avoid duplicates.
-          std::vector<int> alreadyCollidedEntities;
-
-          // For each leaf this rect is inside of
-          for(int j=0; j<currLeafs.size(); j++){
-            QuadTree* currLeaf = currLeafs[j];
-            // Iterate through other rects inside of this leaf
-            // and check for collision with 'curr' rect.
-            for(int k=0; k<currLeaf->points.size(); k++){
-              entitiesCheckedThisFrame++;
-              Entity* other = currLeaf->points[k];
-
-              // if they're the same entity ignore checking this one
-              if(curr->id != other->id){
-
-                // Ensure other hasn't been collided with by this rect already.
-                if(std::count(alreadyCollidedEntities.begin(), alreadyCollidedEntities.end(), other->id) == 0){
-                  bool collision = detectAndResolveCollision(curr, other);
-                  if(collision) {
-                    collisionsThisFrame++;
-                    alreadyCollidedEntities.push_back(other->id);
-                  }
-                }
-              }
-            }
-          }
-        }
+        countCollisions(qTree, &entities, &collisionsThisFrame, &entitiesCheckedThisFrame); 
 
         // Demo just detects collisions and no physics handling, so I don't
         // differentiate the same collision from both entities' perspective.
@@ -159,6 +127,45 @@ int main(int, char**)
     SDL_Quit();
 
     return 0;
+}
+
+// Detects collisions using QuadTree.
+// Will update int* params with info regarding detection.
+void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities, 
+    int* collisionsThisFrame, int* entitiesCheckedThisFrame){
+
+    for(int i=0; i<entities->size(); i++){
+      Entity* currentEntity = entities->at(i);
+
+      // Get all the leafs which contain curr entity. (max of 4)
+      std::vector<QuadTree*> currentEntityLeafs = qTree->getLeafs(currentEntity);
+
+      // Keep tracks of rects collided with to avoid duplicates.
+      std::vector<int> alreadyCollidedEntities;
+
+      for(int j=0; j<currentEntityLeafs.size(); j++){
+        QuadTree* currLeaf = currentEntityLeafs[j];
+
+        // Iterate through other entities inside of this leaf
+        // and check for collision with 'curr' rect.
+        for(int k=0; k<currLeaf->points.size(); k++){
+          *entitiesCheckedThisFrame = *entitiesCheckedThisFrame + 1;
+          Entity* otherEntity = currLeaf->points[k];
+
+          if(currentEntity->id != otherEntity->id){
+
+            // Ensure otherEntity hasn't been collided with by this rect already.
+            if(std::count(alreadyCollidedEntities.begin(), alreadyCollidedEntities.end(), otherEntity->id) == 0){
+              bool collision = detectAndResolveCollision(currentEntity, otherEntity);
+              if(collision) {
+                *collisionsThisFrame = *collisionsThisFrame+1;
+                alreadyCollidedEntities.push_back(otherEntity->id);
+              }
+            }
+          }
+        }
+      }
+    }
 }
 
 // TODO: could make this better, but not a priority.
