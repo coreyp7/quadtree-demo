@@ -22,6 +22,8 @@ const int WINDOW_HEIGHT = 720;
 SDL_Renderer* renderer;
 SDL_Window* window;
 ImGuiIO io; // idk what this is for rn, but imgui needs it
+// Entities (rects) that will exist in our tree.
+std::vector<Entity*> entities;
 
 int setup();
 void showImGui(int collisions, int entityCount, int checksThisFrame, int total);
@@ -31,10 +33,7 @@ void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities, int* colli
 // Main code
 int main(int, char**)
 {
-    QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//,
-
-    // Entities (rects) that will exist in our tree.
-    std::vector<Entity*> entities;
+    QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     int entSize = 35;
     for (int i = 0; i < DEFAULT_COUNT; i++) {
@@ -63,7 +62,8 @@ int main(int, char**)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
-            if (event.type == SDL_MOUSEBUTTONDOWN){
+            if (event.type == SDL_MOUSEBUTTONDOWN && 
+                event.button.button == SDL_BUTTON_RIGHT){
               int xMousePos = event.button.x;
               int yMousePos = event.button.y;
 
@@ -95,9 +95,8 @@ int main(int, char**)
         int entitiesCheckedThisFrame = 0;
         countCollisions(qTree, &entities, &collisionsThisFrame, &entitiesCheckedThisFrame); 
 
-        // Demo just detects collisions and no physics handling, so I don't
-        // differentiate the same collision from both entities' perspective.
-        // So just divide by 2 to show correct amount of collisions.
+        // Demo doubles amount of collisions because it counts collision from both entitys' perspective.
+        // So divide by 2 to show correct amount of collisions.
         collisionsThisFrame = collisionsThisFrame / 2;
 
         // Rendering //
@@ -115,8 +114,11 @@ int main(int, char**)
 
     // Cleanup
     qTree->~QuadTree();
-    //TODO: figure this shit out.
-    //while(!dots.empty()) delete dots.front(), dots.pop_back();
+    while(!entities.empty()){
+      delete entities.back(); 
+      entities.pop_back();  
+    }
+    entities.clear();
 
     ImGui_ImplSDLRenderer_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -192,7 +194,13 @@ void showImGui(int collisions, int entityCount, int checksThisFrame, int total) 
     ImGui::Text(comparisonText.c_str());
     ImGui::Text(lazyText.c_str());
     ImGui::Text(collisionText.c_str());
-    ImGui::Button("Delete all");
+    if(ImGui::Button("Delete all")){
+      while(!entities.empty()){
+        delete entities.back(); 
+        entities.pop_back();  
+      }
+      entities.clear();
+    }
 
     // Sliders which change the value of static ints in QuadTree
     // which limit QuadTree max depth and max entities per leaf.
