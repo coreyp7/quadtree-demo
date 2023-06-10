@@ -5,8 +5,9 @@
 #include "imgui_impl_sdlrenderer.h"
 #include <stdio.h>
 #include <SDL.h>
+#include <string>
 
-#include "Tree.h"
+//#include "Tree.h"
 #include "QuadTree.h"
 #include "Entity.h"
 
