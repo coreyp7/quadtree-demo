@@ -1,8 +1,4 @@
-#include "sorting.h"
-#include <cstdlib>
-#include <cassert>
-#include <unordered_map>
-
+//
 // sdl/imgui
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -22,19 +18,20 @@ const int WINDOW_HEIGHT = 720;
 SDL_Renderer* renderer;
 SDL_Window* window;
 ImGuiIO io; // idk what this is for rn, but imgui needs it
+
 // Entities (rects) that will exist in our tree.
 std::vector<Entity*> entities;
 
 int setup();
 void showImGui(int collisions, int entityCount, int checksThisFrame, int total);
-bool detectAndResolveCollision(Entity* rect1, Entity* rect2);
 void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities, int* collisionsThisFrame, int* entitiesCheckedThisFrame);
+bool checkCollision(Entity* dot1, Entity* dot2);
 
 // Main code
 int main(int, char**)
 {
+    // Populate with initial entities with default count.
     QuadTree* qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
     int entSize = 35;
     for (int i = 0; i < DEFAULT_COUNT; i++) {
         float numbX = rand() % WINDOW_WIDTH;
@@ -67,7 +64,6 @@ int main(int, char**)
               int xMousePos = event.button.x;
               int yMousePos = event.button.y;
 
-              // Spawn an entity at position of mouseclick.
               float size = rand() % entSize;
               Entity* entity = new Entity(xMousePos, yMousePos, size, size);
               entities.push_back(entity);
@@ -75,7 +71,6 @@ int main(int, char**)
         }
 
         // Simulate game state (motion of entities).
-        // Use delta time to make motion consistent.
         float dt = (SDL_GetTicks() - lastPhysicsUpdate)/1000;
         for (int i = 0; i < entities.size(); i++) {
             entities[i]->simulate(dt);
@@ -83,8 +78,6 @@ int main(int, char**)
         lastPhysicsUpdate = SDL_GetTicks();
 
         // Reconstruct QuadTree of all entities/rects
-        // TODO: Should just call an update function to do this internally
-        // so we don't have to construct one of these every frame.
         qTree->~QuadTree();
         qTree = new QuadTree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         for (int i = 0; i < entities.size(); i++) {
@@ -131,6 +124,16 @@ int main(int, char**)
     return 0;
 }
 
+bool checkCollision(Entity* entity1, Entity* entity2){
+  SDL_FRect rect1 = *entity1->rect;
+  SDL_FRect rect2 = *entity2->rect;
+
+  bool xCollision = (((rect1.x + rect1.w) >= (rect2.x)) && ((rect2.x + rect2.w) >= (rect1.x)));
+  bool yCollision = (((rect1.y + rect1.h) >= (rect2.y)) && ((rect2.y + rect2.h) >= (rect1.y)));
+
+  return xCollision && yCollision;
+}
+
 // Detects collisions using QuadTree.
 // Will update int* params with info regarding detection.
 void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities, 
@@ -158,7 +161,7 @@ void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities,
 
             // Ensure otherEntity hasn't been collided with by this rect already.
             if(std::count(alreadyCollidedEntities.begin(), alreadyCollidedEntities.end(), otherEntity->id) == 0){
-              bool collision = detectAndResolveCollision(currentEntity, otherEntity);
+              bool collision = checkCollision(currentEntity, otherEntity);
               if(collision) {
                 *collisionsThisFrame = *collisionsThisFrame+1;
                 alreadyCollidedEntities.push_back(otherEntity->id);
@@ -170,7 +173,6 @@ void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities,
     }
 }
 
-// TODO: could make this better, but not a priority.
 // Parameters are all the stuff ImGui needs to display not in scope.
 void showImGui(int collisions, int entityCount, int checksThisFrame, int total) {
     ImGui_ImplSDLRenderer_NewFrame();
@@ -260,50 +262,5 @@ int setup() {
     return 0;
 }
 
-// TODO: dot is leftover from early version with pixels instead of rects.
-bool checkCollision(Entity* dot1, Entity* dot2){
-  SDL_FRect rect1 = *dot1->rect;
-  SDL_FRect rect2 = *dot2->rect;
 
-  bool xCollision = (((rect1.x + rect1.w) >= (rect2.x)) && ((rect2.x + rect2.w) >= (rect1.x)));
-  bool yCollision = (((rect1.y + rect1.h) >= (rect2.y)) && ((rect2.y + rect2.h) >= (rect1.y)));
-
-  return xCollision && yCollision;
-}
-
-// TODO: remove this and just use collision function above,
-// I'm not resolving this shit in this project, will save for
-// the game I make to try and decouple physics in its own module.
-bool detectAndResolveCollision(Entity* dot1, Entity* dot2){
-  bool collision = checkCollision(dot1, dot2);
-  SDL_FRect rect1 = *dot1->rect;
-  SDL_FRect rect2 = *dot2->rect;
-
-  if(collision){
-    // find out which axis is easier to resolve (recall warehouse escape) 
-    // should be fine for this i think.
-    // First figure out which side the collision is happening relative to dot1.
-    float xDist, yDist;
-    if(rect1.x < rect2.x){
-      xDist = ((rect1.x + rect1.w) - rect2.x);
-    } else {
-      xDist = ((rect2.x + rect2.w) - rect1.x);
-    }
-
-    if(rect1.y < rect2.y){
-      yDist = ((rect1.y + rect1.h) - rect2.y);
-    } else {
-      yDist = ((rect2.y + rect2.h) - rect1.y);
-    }
-
-    if(xDist > yDist){
-      dot1->yVel = -dot1->yVel; 
-      dot2->yVel = -dot2->yVel; 
-    } else {
-      dot1->xVel = -dot1->xVel;
-      dot2->xVel = -dot2->xVel;
-    }
-  }
-  return collision;
-}
 

@@ -51,34 +51,28 @@ void QuadTree::insert(Entity* point) {
 		// If so, then create our 4 quadtrees and insert
 		// all my points into my (appropriate) children.
 		if (points.size() >= LIMIT) {
+
       if(depth >= DEPTH_LIMIT){
+        // ignore; stop making new quadtrees.
         return; 
-        // ignore; stop making new quadtrees to avoid stackoverflow.
-        // these rects are probably colliding
       }
 
 			isLeaf = false;
 	
-			// TODO: could make this cleaner by precalculating width/height stuff.
 			nw = new QuadTree(x, y, width / 2, height / 2);
 			ne = new QuadTree(x + (width / 2), y, width / 2, height / 2);
 			sw = new QuadTree(x, y + (height / 2), width / 2, height / 2);
 			se = new QuadTree(x + (width / 2), y + (height / 2), width / 2, height / 2);
-      //TODO: make this less stupid if you feel it neccessary.
+      // todo: put this in quadtree constructor.
       nw->depth = this->depth+1;
       ne->depth = this->depth+1;
       sw->depth = this->depth+1;
       se->depth = this->depth+1;
 
-			// For now, I'm going to add the point to every tree
-			// which it technically belongs to. I believe this
-			// is how this is supposed to work.
+			// Add entity to each leaf it belongs to.
 			for (int i = 0; i < points.size(); i++) {
 				if (nw->insideOf(points[i])) {
-					nw->insert(points[i]); // A stackoverflow points to here.
-					// I think its because insideOf function is shitty right now.
-					// Because this insert infinitely loops on the second
-					// square in the points list.
+					nw->insert(points[i]);
 				}
 				if (ne->insideOf(points[i])) {
 					ne->insert(points[i]);
@@ -90,8 +84,8 @@ void QuadTree::insert(Entity* point) {
 					se->insert(points[i]);
 				}
 			}
-      // Leafs can only have points. This is no longer a leaf, so clear our
-      // points.
+
+      // Only leafs can contain entities, so clear this tree's points.
 			points.clear();
 		}
 	}
@@ -105,9 +99,10 @@ bool QuadTree::insideOf(Entity* point) {
 	bool colY = ((rect->y + rect->h) >= y) && ((y + height) >= rect->y);
 
 	return colX && colY;
-
 }
 
+// Render this QuadTree and all of its children.
+// Also draws all contained entities.
 void QuadTree::draw(SDL_Renderer* renderer) {
 	SDL_Rect rect = { x,y,width,height };
 
@@ -115,14 +110,8 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 	SDL_RenderDrawRect(renderer, &rect);
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	
-	// Because there's only points in leafs (as of rn),
-	// only check if this is a leaf.
 	if (isLeaf) {
 		for (int i = 0; i < points.size(); i++) {
-			//SDL_RenderDrawPoint(renderer, points[i].x, points[i].y);
-			//SDL_FRect frect = { points[i]->rect->x, points[i]->pos->y, 4, 4 };
-			//SDL_RenderDrawRectF(renderer, &frect);
-			//SDL_RenderFillRectF(renderer, points[i]->rect);
       SDL_RenderDrawRectF(renderer, points[i]->rect);
 		}
 	}
@@ -134,32 +123,11 @@ void QuadTree::draw(SDL_Renderer* renderer) {
 	}
 }
 
-// @unfinished.
-void QuadTree::update() {
-	/*
-	* NOTE: at some point I'm going to have to check if
-	* all of a QuadTree's leafs are empty. If so, then we 
-	* change that QuadTree back into a leaf. 
-	*/
 
-	if (isLeaf) {
-		for (int i = 0; i < points.size(); i++) {
-			if (!insideOf(points[i])) {
-
-			}
-		}
-	}
-	else {
-		nw->update();
-		ne->update();
-		sw->update();
-		se->update();
-	}
-}
-
-// Will return all leafs which the passed in object (currently a Entity)
+// Will return all leafs which the passed in Entity
 // is contained in. (An object can be in more than one leaf at a time).
 std::vector<QuadTree*> QuadTree::getLeafs(Entity* dot){
+
 	// If not leaf; call getLeaf on children which contain rect.
   // Else, return yourself in a vector.
   std::vector<QuadTree*> trees;
