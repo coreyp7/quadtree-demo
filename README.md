@@ -1,6 +1,6 @@
 # QuadTree demo
 
-[![Here's a link to a video of the demo.](https://img.youtube.com/vi/rHf6aKyx8l8/0.jpg)](https://youtu.be/rHf6aKyx8l8 "QuadTree demo video")
+[![Here's a link to a video of the demo.](./assets/demogif.gif)](https://youtu.be/rHf6aKyx8l8 "QuadTree demo video")
 
 ## [Here's a link to a video of the demo.](https://youtu.be/rHf6aKyx8l8)
 
