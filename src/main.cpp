@@ -11,7 +11,8 @@
 #include "QuadTree.h"
 #include "Entity.h"
 
-const int DEFAULT_COUNT = 500;
+//const int DEFAULT_COUNT = 500;
+const int DEFAULT_COUNT = 1500;
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 
@@ -179,13 +180,14 @@ void showImGui(int collisions, int entityCount, int checksThisFrame, int total) 
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    bool show = true;
 
-    ImGui::ShowDemoWindow(&show);
+    //bool show = true;
+    //ImGui::ShowDemoWindow(&show);
+
     ImGui::Begin("Info");
     std::string comparisonText = "Number of comparisons this frame:";
     std::string lazyText = "Comparisons w/o tree (brute force):";
-    std::string countText = "Total:";
+    std::string countText = "Total entities:";
     std::string collisionText = "Collisions this frame:";
 
     collisionText += std::to_string(collisions);
@@ -234,7 +236,7 @@ int setup() {
 
     // Create window with SDL_Renderer graphics context
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, window_flags);
+    window = SDL_CreateWindow("QuadTree Collision Detection demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, window_flags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
     {
