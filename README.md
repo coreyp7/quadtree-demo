@@ -1,6 +1,8 @@
 # QuadTree demo
 
-A link to a video of the demo will be here once I upload it.
+[![Here's a link to a video of the demo.](https://img.youtube.com/vi/rHf6aKyx8l8/0.jpg)](https://youtu.be/rHf6aKyx8l8 "QuadTree demo video")
+
+## [Here's a link to a video of the demo.](https://youtu.be/rHf6aKyx8l8)
 
 My first implementation of a QuadTree. Wanted to learn about spatial data structures for use in game development, so I created a demo of large amounts of collisions occurring utilizing this data structure.
 
