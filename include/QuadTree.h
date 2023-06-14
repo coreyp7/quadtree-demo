@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h> // using only for certain structs
 #include <vector>
+#include <set>
 #include "Entity.h"
 
 class QuadTree {
@@ -50,5 +51,13 @@ public:
 
 	void update();
 
+  // Obtain list of all leaf nodes which thie provided entity is inside of.
   std::vector<QuadTree*> getLeafs(Entity* dot);
+
+  // Counts amount of collisions with an entity. 
+  // Will increment collisions/comparisons as the entities are checked.
+  void getCollisionsWithEntity(Entity* entity, int* collisions, int* comparisons);
+
+  // AABB collision.
+  bool checkCollision(Entity* entity1, Entity* entity2);
 };

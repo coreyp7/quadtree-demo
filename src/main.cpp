@@ -126,52 +126,15 @@ int main(int, char**)
     return 0;
 }
 
-bool checkCollision(Entity* entity1, Entity* entity2){
-  SDL_FRect rect1 = *entity1->rect;
-  SDL_FRect rect2 = *entity2->rect;
-
-  bool xCollision = (((rect1.x + rect1.w) >= (rect2.x)) && ((rect2.x + rect2.w) >= (rect1.x)));
-  bool yCollision = (((rect1.y + rect1.h) >= (rect2.y)) && ((rect2.y + rect2.h) >= (rect1.y)));
-
-  return xCollision && yCollision;
-}
-
-// Detects collisions using QuadTree.
-// Will update int* params with info regarding detection.
+// Detects entity collisions using QuadTree.
+// Will update int* params with info regarding detection. Lazy but is an easy
+// way to count this stuff for the demo.
 void countCollisions(QuadTree *qTree, std::vector<Entity*> *entities, 
     int* collisionsThisFrame, int* entitiesCheckedThisFrame){
 
     for(int i=0; i<entities->size(); i++){
       Entity* currentEntity = entities->at(i);
-
-      // Get all the leafs which contain curr entity. (max of 4)
-      std::vector<QuadTree*> currentEntityLeafs = qTree->getLeafs(currentEntity);
-
-      // Keep tracks of rects collided with to avoid duplicates.
-      std::vector<int> alreadyCollidedEntities;
-
-      for(int j=0; j<currentEntityLeafs.size(); j++){
-        QuadTree* currLeaf = currentEntityLeafs[j];
-
-        // Iterate through other entities inside of this leaf
-        // and check for collision with 'curr' rect.
-        for(int k=0; k<currLeaf->points.size(); k++){
-          *entitiesCheckedThisFrame = *entitiesCheckedThisFrame + 1;
-          Entity* otherEntity = currLeaf->points[k];
-
-          if(currentEntity->id != otherEntity->id){
-
-            // Ensure otherEntity hasn't been collided with by this rect already.
-            if(std::count(alreadyCollidedEntities.begin(), alreadyCollidedEntities.end(), otherEntity->id) == 0){
-              bool collision = checkCollision(currentEntity, otherEntity);
-              if(collision) {
-                *collisionsThisFrame = *collisionsThisFrame+1;
-                alreadyCollidedEntities.push_back(otherEntity->id);
-              }
-            }
-          }
-        }
-      }
+      qTree->getCollisionsWithEntity(currentEntity, collisionsThisFrame, entitiesCheckedThisFrame);
     }
 }
 
